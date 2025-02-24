@@ -1,12 +1,14 @@
 .title {
     text-align: center;
-    font-family:'Courier New', Courier, monospace;
+    font-family: 'Courier New', Courier, monospace;
     padding-top: 5px;
     padding-bottom: 5px;
 }
+
 body, footer{
-    font-family:Helvetica, Arial, sans-serif;
+    font-family: Helvetica, Arial, sans-serif;
 }
+
 #main-nav {
     background-color: gainsboro;
     .navbar-nav {
@@ -18,6 +20,7 @@ body, footer{
         padding-right: 30px;
     }
 }
+
 #footer {
     background-color: gainsboro;
     color: black;
@@ -25,6 +28,7 @@ body, footer{
         color: black;
     }
 }
+
 #add-button {
     background-color: white;
     color: black;
@@ -37,14 +41,15 @@ body, footer{
     border-radius: 50%;
     border-width: 1.5px;
     padding: 0px;
-    margin-left:auto;
-    margin-right:auto;
+    margin-left: auto;
+    margin-right: auto;
     margin-bottom: 30px;
 }
+
 .card {
     border-color: black;
     border-width: 1.5px;
-    margin-left:auto;
-    margin-right:auto;
+    margin-left: auto;
+    margin-right: auto;
     margin-bottom: 30px;
 }
