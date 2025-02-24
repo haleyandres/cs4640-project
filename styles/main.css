@@ -1,0 +1,25 @@
+#site-title {
+    text-align: center;
+    font-family:'Courier New', Courier, monospace;
+}
+body, footer{
+    font-family:Helvetica, Arial, sans-serif;
+}
+#main-nav {
+    background-color: gainsboro;
+    .navbar-nav {
+        margin-left: auto;
+        margin-right: auto;
+    }
+    .navbar-nav a {
+        padding-left: 30px;
+        padding-right: 30px;
+    }
+}
+#footer {
+    background-color: gainsboro;
+    color: black;
+    .nav-link{
+        color: black;
+    }
+}
