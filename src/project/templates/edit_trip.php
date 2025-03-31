@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        <title>Travel Diary - Trips</title>
+        <title>Travel Diary - Add Trip</title>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1"> 
@@ -36,39 +36,41 @@
             </nav>
             <!-- page title -->
             <div class="row title my-4">
-                <h1>My Trips</h1>
+                <h1>Edit Trip</h1>
             </div>
-            <?php if(!empty($trips)): ?>
-                <div class="row row-cols-1 row-cols-md-2 mx-5">
-                    <!-- add button -->
-                    <div class="col">
-                        <a class="btn btn-outline-dark" id="add-button" href="?command=addtrip" role="button">+</a>
-                    </div>
-                    <!-- trip cards -->
-                    <?php foreach ($trips as $trip): ?>
-                        <div class="col">
-                            <div class="card" style="width: 22rem;">
-                                <div class="card-header">
-                                    <h5 class="card-title">Trip to <?=$trip["city"]?>, <?=$trip["country"]?></h5>
-                                </div>
-                                <div class="card-body">
-                                    <h6 class="card-subtitle mb-2 text-muted">
-                                        <?= date("F j, Y", strtotime($trip["start_date"])) ?> - 
-                                        <?= date("F j, Y", strtotime($trip["end_date"])) ?>
-                                    </h6>
-                                    <p class="card-text"><?=$trip["notes"]?></p>
-                                    <a href="?command=edit_trip&id=<?= $trip['id'] ?>" class="btn btn-sm" style="background-color: gainsboro; color: black;">Edit</a>
-                                    <a href="?command=delete_trip&id=<?= $trip['id'] ?>" class="btn btn-sm" style="background-color: gainsboro; color: black;">Delete</a>
-                                </div>
-                            </div>
+            <!-- add trip form -->
+            <div class="row justify-content-center">
+                <div class="col-6">
+                    <form id="add-trip-form">
+                        <div class="mb-3">
+                            <label for="trip-name" class="form-label">Trip Name</label>
+                            <input type="text" value="<?php echo $result[0]["name"]?>" class="form-control" id="trip-name" name="trip-name" required>
                         </div>
-                    <?php endforeach; ?>
+                        <div class="mb-3">
+                            <label for="start-date" class="form-label">Start Date</label>
+                            <input type="date" value="<?php echo $result[0]["start_date"]?>" class="form-control" id="start-date" name="start-date" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="location" class="form-label">Primary Location</label>
+                            <input type="text" value="<?php echo $result[0]["city"]?>, <?php echo $result[0]["country"]?>" class="form-control" id="location" name="location" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="collaborators" class="form-label">Collaborators</label>
+                            <select id="collaborators" class="form-select" aria-label="collaborators">
+                                <option selected><?php echo $result[0]["collaborators"]?></option>
+                                <?php foreach($users as $user): ?>
+                                    <option value="<?php echo $user["id"]?>"><?php echo $user["name"];?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="trip-description" class="form-label">Description</label>
+                            <textarea class="form-control" id="trip-description" name="trip-description" rows="3" required><?php echo $result[0]["notes"]?></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-secondary">Add Trip</button>
+                    </form>
                 </div>
-            <?php else: ?>
-                <div class="d-flex justify-content-center align-items-center" style="height: 30vh;">
-                    <a class="btn btn-outline-dark" id="add-button" href="?command=addtrip" role="button">+</a>
-                </div>
-            <?php endif; ?>
+            </div>
             <!-- site footer -->
             <footer class="py-3 my-4" id="footer">
                 <ul class="nav justify-content-center border-bottom pb-3 mb-3">
@@ -80,6 +82,7 @@
                 <p class="text-center">Copyright © 2025</p>
             </footer>
         </div>
+
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     </body>
 </html>

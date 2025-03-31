@@ -40,6 +40,7 @@
     $res  = pg_query($dbHandle, "create table project_trips (
             id  int primary key default nextval('project_trips_seq'),
             user_id int references project_users(id) on delete cascade,
+            name text,
             longitude double precision,
             latitude double precision,
             city text,

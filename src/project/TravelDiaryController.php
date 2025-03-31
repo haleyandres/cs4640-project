@@ -58,6 +58,12 @@ class TravelDiaryController {
       case "save_entry_edits":
         $this->saveEntryEdits();
         break;
+      case "edit_trip":
+        $this->showEditTrip();
+        break;
+      case "save_trip_edits":
+        $this->saveTripEdits();
+        break;
       case "userinfo":
         $this->userInfoAPI();
         break;
@@ -182,7 +188,28 @@ class TravelDiaryController {
     include("/opt/src/project/templates/edit_entry.php");
   }
 
+  public function showEditTrip() {
+    if (!isset($_SESSION["user_id"]) || !isset($this->input["id"])) {
+        header("Location: ?command=trips");
+        exit;
+    }
+    $tripId = $this->input["id"];
+    $userId = $_SESSION["user_id"];
+    $result = $this->db->query("select * from project_trips where id = $1 and user_id = $2;", $tripId, $userId);
+
+    if (empty($result)) {
+        header("Location: ?command=trips");
+        exit;
+    }
+    $users = $this->db->query("select name from project_users where id != $1", $userId);
+    include("/opt/src/project/templates/edit_trip.php");
+  }
+
   public function saveEntryEdits() {
+
+  }
+
+  public function saveTripEdits() {
 
   }
   
