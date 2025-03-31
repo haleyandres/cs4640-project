@@ -38,41 +38,37 @@
             <div class="row title my-4">
                 <h1>My Trips</h1>
             </div>
-            <div class="row row-cols-1 row-cols-md-2 mx-5">
-                <!-- add button -->
-                <div class="col">
+            <?php if(!empty($trips)): ?>
+                <div class="row row-cols-1 row-cols-md-2 mx-5">
+                    <!-- add button -->
+                    <div class="col">
+                        <a class="btn btn-outline-dark" id="add-button" href="?command=addtrip" role="button">+</a>
+                    </div>
+                    <!-- trip cards -->
+                    <?php foreach ($trips as $trip): ?>
+                        <div class="col">
+                            <div class="card" style="width: 22rem;">
+                                <div class="card-header">
+                                    <h5 class="card-title">Trip to <?=$trip["city"]?>, <?=$trip["country"]?></h5>
+                                </div>
+                                <div class="card-body">
+                                    <h6 class="card-subtitle mb-2 text-muted">
+                                        <?= date("F j, Y", strtotime($trip["start_date"])) ?> - 
+                                        <?= date("F j, Y", strtotime($trip["end_date"])) ?>
+                                    </h6>
+                                    <p class="card-text"><?=$trip["notes"]?></p>
+                                    <!-- <a href="?command=edit_trip&id=<?= $trip['id'] ?>" class="btn btn-sm" style="background-color: gainsboro; color: black;">Edit</a> -->
+                                    <a href="?command=delete_trip&id=<?= $trip['id'] ?>" class="btn btn-sm" style="background-color: gainsboro; color: black;">Delete</a>
+                                </div>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            <?php else: ?>
+                <div class="d-flex justify-content-center align-items-center" style="height: 30vh;">
                     <a class="btn btn-outline-dark" id="add-button" href="?command=addtrip" role="button">+</a>
                 </div>
-                <!-- trip cards -->
-                <div class="col">
-                    <div class="card" style="width: 18rem;">
-                        <div class="card-body">
-                          <h5 class="card-title">Trip to Spain</h5>
-                          <h6 class="card-subtitle mb-2 text-body-secondary">June 2019</h6>
-                          <p class="card-text">Info about the trip.</p>
-                        </div>
-                      </div>
-                </div>
-                <div class="col">
-                    <div class="card" style="width: 18rem;">
-                        <div class="card-body">
-                          <h5 class="card-title">Trip to Iceland</h5>
-                          <h6 class="card-subtitle mb-2 text-body-secondary">March 2022</h6>
-                          <p class="card-text">Info about the trip.</p>
-                        </div>
-                      </div>
-                </div>
-                <div class="col">
-                    <div class="card" style="width: 18rem;">
-                        <div class="card-body">
-                          <h5 class="card-title">Trip to Arizona</h5>
-                          <h6 class="card-subtitle mb-2 text-body-secondary">September 2011</h6>
-                          <p class="card-text">Info about the trip.</p>
-                        </div>
-                      </div>
-                </div>
-                
-            </div>
+            <?php endif; ?>
             <!-- site footer -->
             <footer class="py-3 my-4" id="footer">
                 <ul class="nav justify-content-center border-bottom pb-3 mb-3">

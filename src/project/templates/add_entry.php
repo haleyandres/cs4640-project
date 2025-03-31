@@ -25,9 +25,9 @@
                       </button>
                     <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
                         <div class="navbar-nav">
-                          <a class="nav-link active" aria-current="page" href="?command=home">Map</a>
+                          <a class="nav-link" href="?command=home">Map</a>
                           <a class="nav-link" href="?command=trips">Trips</a>
-                          <a class="nav-link" href="?command=entries">Entries</a>
+                          <a class="nav-link active" aria-current="page" href="?command=entries">Entries</a>
                           <a class="nav-link" href="?command=stats">Stats</a>
                           <a class="nav-link" href="?command=logout">Logout</a>
                         </div>

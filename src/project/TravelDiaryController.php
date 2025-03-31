@@ -46,6 +46,9 @@ class TravelDiaryController {
       case "addentry":
         $this->showAddEntry();
         break;
+      case "delete_trip":
+        $this->deleteTrip();
+        break;
       case "userinfo":
         $this->userInfoAPI();
         break;
@@ -127,6 +130,18 @@ class TravelDiaryController {
     header("Content-Type: application/json");
     echo(json_encode($userInfo, JSON_PRETTY_PRINT));
   }
+
+  public function deleteTrip() {
+    if (!isset($_SESSION["user_id"]) || !isset($this->input["id"])) {
+        header("Location: ?command=trips");
+        exit;
+    }
+    $tripId = $this->input["id"];
+    $userId = $_SESSION["user_id"];
+    $result = $this->db->query("DELETE FROM project_trips WHERE id = $1 AND user_id = $2;", $tripId, $userId);
+    header("Location: ?command=trips");
+    exit;
+  }
   
   public function showLogin($message = "") {
     include("/opt/src/project/templates/login.php");
@@ -141,6 +156,7 @@ class TravelDiaryController {
   }
 
   public function showTrips($message = "") {
+    $trips = $this->db->query("SELECT * FROM project_trips WHERE user_id = $1 ORDER BY start_date DESC;", $_SESSION["user_id"]);
     include("/opt/src/project/templates/trips.php");
   }
 
