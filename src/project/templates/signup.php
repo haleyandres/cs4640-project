@@ -23,10 +23,10 @@
             <div class="card p-4 shadow-lg mt-5 mx-auto" style="width: 35rem;">
                 <div class="card-body">
                   <h3 class="card-title mb-4 title">Create an account</h3>
-                  <form action="?command=login" method="post">
+                  <form action="?command=signup" method="post">
                     <div class="mb-3">
                         <label for="name" class="form-label"><strong>Name</strong></label>
-                        <input type="text" class="form-control" id="name" name="fullname">
+                        <input type="text" class="form-control" id="name" name="name">
                     </div>
                     <div class="form-group mb-3">
                       <label for="email" class="form-label"><strong>Email address</strong></label>
@@ -44,6 +44,7 @@
                     <?=$message?>
                     <div class="d-flex justify-content-between mt-4">
                         <button type="submit" class="btn btn-secondary">Create Account</button>
+                        <a href="?command=welcome" class="btn" role="button" style="background-color: gainsboro; color: black;">Return to Login</a>
                     </div>
                   </form>
                 </div>

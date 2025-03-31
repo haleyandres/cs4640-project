@@ -36,7 +36,7 @@
                     <?=$message?>
                     <div class="d-flex justify-content-between mt-4">
                         <button type="submit" class="btn btn-secondary">Log In</button>
-                        <a href="?command=signup" class="btn" role="button" style="background-color: gainsboro; color: black;">Create an account</a>    
+                        <a href="?command=create_account" class="btn" role="button" style="background-color: gainsboro; color: black;">Create an account</a>    
                     </div>
                   </form>
                 </div>

@@ -24,12 +24,13 @@
                     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
                         <span class="navbar-toggler-icon"></span>
                       </button>
-                    <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+                    <div class="collapse navbar-collapse justify" id="navbarNavAltMarkup">
                         <div class="navbar-nav">
                           <a class="nav-link active" aria-current="page" href="?command=home">Map</a>
                           <a class="nav-link" href="?command=trips">Trips</a>
                           <a class="nav-link" href="?command=entries">Entries</a>
                           <a class="nav-link" href="?command=stats">Stats</a>
+                          <a class="nav-link" href="?command=logout">Logout</a>
                         </div>
                     </div>
                 </div>

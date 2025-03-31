@@ -29,6 +29,7 @@
                           <a class="nav-link" href="?command=trips">Trips</a>
                           <a class="nav-link" href="?command=entries">Entries</a>
                           <a class="nav-link" href="?command=stats">Stats</a>
+                          <a class="nav-link" href="?command=logout">Logout</a>
                         </div>
                     </div>
                 </div>
