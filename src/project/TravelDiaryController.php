@@ -52,6 +52,12 @@ class TravelDiaryController {
       case "delete_entry":
         $this->deleteEntry();
         break;
+      case "edit_entry":
+        $this->showEditEntry();
+        break;
+      case "save_entry_edits":
+        $this->saveEntryEdits();
+        break;
       case "userinfo":
         $this->userInfoAPI();
         break;
@@ -156,6 +162,28 @@ class TravelDiaryController {
     $result = $this->db->query("DELETE FROM project_entries WHERE id = $1 AND user_id = $2;", $entryId, $userId);
     header("Location: ?command=entries");
     exit;
+  }
+
+  public function showEditEntry() {
+    if (!isset($_SESSION["user_id"]) || !isset($this->input["id"])) {
+        header("Location: ?command=entries");
+        exit;
+    }
+    $entryId = $this->input["id"];
+    $userId = $_SESSION["user_id"];
+    $result = $this->db->query("select * from project_entries where id = $1 and user_id = $2;", $entryId, $userId);
+
+    if (empty($result)) {
+        header("Location: ?command=entries");
+        exit;
+    }
+    $userTrips = $this->db->query("select * from project_trips where user_id = $1", $userId);
+    $trip = $this->db->query("select * from project_trips where id = $1", $result[0]["trip_id"]);
+    include("/opt/src/project/templates/edit_entry.php");
+  }
+
+  public function saveEntryEdits() {
+
   }
   
   public function showLogin($message = "") {

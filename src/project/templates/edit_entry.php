@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        <title>Travel Diary - Entries</title>
+        <title>Travel Diary - Add Entry</title>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1"> 
@@ -36,37 +36,39 @@
             </nav>
             <!-- page title -->
             <div class="row title my-4">
-                <h1>My Entries</h1>
+                <h1>Edit Entry</h1>
             </div>
-            <?php if(!empty($entries)): ?>
-                <div class="row row-cols-1 mx-5">
-                    <!-- add button -->
-                    <div class="col">
-                        <a class="btn btn-outline-dark" id="add-button" href="?command=addentry" role="button">+</a>
-                    </div>
-                    <!-- entry cards -->
-                    <?php foreach ($entries as $entry): ?>
-                        <div class="col">
-                            <div class="card" style="width: 50rem;">
-                                <div class="card-header">
-                                    <h5 class="card-title"><?=$entry["title"]?></h5>
-                                    <h6 class="card-subtitle text-body-secondary"><?=$entry["date"]?></h6>
-                                </div>
-                                <div class="card-body">
-                                    <p class="card-text"><?=$entry["entry"]?></p>
-                                    <a href="?command=edit_entry&id=<?= $entry['id'] ?>" class="btn btn-sm" style="background-color: gainsboro; color: black;">Edit</a>
-                                    <a href="?command=delete_entry&id=<?= $entry['id'] ?>" class="btn btn-sm" style="background-color: gainsboro; color: black;">Delete</a>
-                                </div>
-                            </div>
+            <!-- add entry form -->
+            <div class="row justify-content-center">
+                <div class="col-6">
+                    <form id="edit-entry-form" action="?command=save_entry_edits">
+                        <div class="mb-3">
+                            <label for="title" class="form-label">Title</label>
+                            <input type="text" value="<?php echo $result[0]["title"]?>" class="form-control" id="title" name="title" required>
                         </div>
-                    <?php endforeach; ?>
+                        <div class="mb-3">
+                            <label for="trip" class="form-label">Trip</label>
+                            <select id="trip" class="form-select" aria-label="trip">
+                                <option selected><?php echo $trip[0]["city"];?>, <?php echo $trip[0]["country"];?></option>
+                                <?php foreach($userTrips as $userTrip): ?>
+                                    <?php if ($userTrip["id"] !== $trip[0]["id"]): ?>
+                                        <option value="<?php echo $userTrip["id"]?>"><?php echo $userTrip["city"];?>, <?php echo $userTrip["country"];?></option>
+                                    <?php endif; ?>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="date" class="form-label">Date</label>
+                            <input type="date" class="form-control" value="<?php echo $result[0]["date"];?>" id="date" name="date" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="entry" class="form-label">Entry</label>
+                            <textarea class="form-control" id="entry" name="entry" rows="3" required><?php echo $result[0]["entry"]?></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-secondary">Save Edits</button>
+                    </form>
                 </div>
-            <?php else: ?>
-                <!-- add button -->
-                <div class="d-flex justify-content-center align-items-center" style="height: 30vh;">
-                        <a class="btn btn-outline-dark" id="add-button" href="?command=addentry" role="button">+</a>
-                </div>
-            <?php endif; ?>
+            </div>
             <!-- site footer -->
             <footer class="py-3 my-4" id="footer">
                 <ul class="nav justify-content-center border-bottom pb-3 mb-3">
