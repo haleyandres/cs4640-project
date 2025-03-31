@@ -38,40 +38,34 @@
             <div class="row title my-4">
                 <h1>My Entries</h1>
             </div>
-            <div class="row row-cols-1 mx-5">
+            <?php if(!empty($entries)): ?>
+                <div class="row row-cols-1 mx-5">
+                    <!-- add button -->
+                    <div class="col">
+                        <a class="btn btn-outline-dark" id="add-button" href="?command=addentry" role="button">+</a>
+                    </div>
+                    <!-- entry cards -->
+                    <?php foreach ($entries as $entry): ?>
+                        <div class="col">
+                            <div class="card" style="width: 50rem;">
+                                <div class="card-header">
+                                    <h5 class="card-title"><?=$entry["title"]?></h5>
+                                    <h6 class="card-subtitle text-body-secondary"><?=$entry["date"]?></h6>
+                                </div>
+                                <div class="card-body">
+                                    <p class="card-text"><?=$entry["entry"]?></p>
+                                    <a href="?command=delete_entry&id=<?= $entry['id'] ?>" class="btn btn-sm" style="background-color: gainsboro; color: black;">Delete</a>
+                                </div>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            <?php else: ?>
                 <!-- add button -->
-                <div class="col">
-                    <a class="btn btn-outline-dark" id="add-button" href="?command=addentry" role="button">+</a>
+                <div class="d-flex justify-content-center align-items-center" style="height: 30vh;">
+                        <a class="btn btn-outline-dark" id="add-button" href="?command=addentry" role="button">+</a>
                 </div>
-                <!-- trip cards -->
-                <div class="col">
-                    <div class="card">
-                        <div class="card-body">
-                          <h5 class="card-title">Entry from Spain</h5>
-                          <h6 class="card-subtitle mb-2 text-body-secondary">June 5, 2019</h6>
-                          <p class="card-text">Entry text...</p>
-                        </div>
-                      </div>
-                </div>
-                <div class="col">
-                    <div class="card">
-                        <div class="card-body">
-                          <h5 class="card-title">Entry from Spain</h5>
-                          <h6 class="card-subtitle mb-2 text-body-secondary">June 7, 2019</h6>
-                          <p class="card-text">Entry text...</p>
-                        </div>
-                      </div>
-                </div>
-                <div class="col">
-                    <div class="card">
-                        <div class="card-body">
-                          <h5 class="card-title">Entry from Iceland</h5>
-                          <h6 class="card-subtitle mb-2 text-body-secondary">March 20, 2022</h6>
-                          <p class="card-text">Entry text...</p>
-                        </div>
-                      </div>
-                </div>
-            </div>
+            <?php endif; ?>
             <!-- site footer -->
             <footer class="py-3 my-4" id="footer">
                 <ul class="nav justify-content-center border-bottom pb-3 mb-3">
