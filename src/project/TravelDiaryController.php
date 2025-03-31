@@ -113,9 +113,13 @@ class TravelDiaryController {
             $message = "<p class='alert alert-danger'>Please enter a valid email address</p>";
         } else {            // check passwords match
             if ($_POST["password"] == $_POST["confirmPassword"]) {
+                // add user to user table
                 $result = $this->db->query("insert into project_users (name, email, password) values ($1, $2, $3) returning id;",
                     $_POST["name"], $_POST["email"], password_hash($_POST["password"], PASSWORD_DEFAULT));
                 $_SESSION["user_id"] = $result[0]["id"];
+                // add entry for user in stats table
+                $stat = $this->db->query("insert into project_stats (user_id) values ($1);", $_SESSION["user_id"]);
+                // redirect to home page
                 header("Location: ?command=home");
                 exit;
             } else {
@@ -226,12 +230,12 @@ class TravelDiaryController {
   }
 
   public function showTrips($message = "") {
-    $trips = $this->db->query("SELECT * FROM project_trips WHERE user_id = $1 ORDER BY start_date DESC;", $_SESSION["user_id"]);
+    $trips = $this->db->query("select * from project_trips where user_id = $1 order by start_date desc;", $_SESSION["user_id"]);
     include("/opt/src/project/templates/trips.php");
   }
 
   public function showEntries($message = "") {
-    $entries = $this->db->query("SELECT * FROM project_entries WHERE user_id = $1 ORDER BY date DESC;", $_SESSION["user_id"]);
+    $entries = $this->db->query("select * from project_entries where user_id = $1 order by date desc;", $_SESSION["user_id"]);
     include("/opt/src/project/templates/entries.php");
   }
 
@@ -244,6 +248,12 @@ class TravelDiaryController {
   }
 
   public function showStats($message = "") {
+    $userId = $_SESSION["user_id"];
+    $stats = $this->db->query("select * from project_stats where user_id = $1", $userId);
+    $firstTrip = $this->db->query("select start_date from project_trips where user_id = $1 order by start_date asc limit 1;", $userId);
+    if(!empty($firstTrip)) {
+        $firstTripDate = date("F j, Y", strtotime($firstTrip[0]['start_date']));
+    }
     include("/opt/src/project/templates/stats.php");
   }
 }

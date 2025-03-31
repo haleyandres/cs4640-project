@@ -52,8 +52,10 @@
                     <div class="card w-100">
                         <div class="card-body">
                             <h5 class="card-title"><a href="?command=trips" class="card-title stretched-link">Total Trips Taken</a></h5>
-                            <h6 class="card-subtitle mb-2 text-body-secondary">June 2018 - February 2025</h6>
-                            <p class="card-text display-1">13</p>
+                            <?php if(!empty($firstTrip)): ?>
+                                <h6 class="card-subtitle mb-2 text-body-secondary"><?php echo $firstTripDate?> - <?php echo date("F j, Y")?></h6>
+                            <?php endif; ?>
+                            <p class="card-text display-1"><?php echo $stats[0]["num_trips"]?></p>
                         </div>
                     </div>
                 </div>
@@ -61,8 +63,10 @@
                     <div class="card w-100">
                         <div class="card-body">
                             <h5 class="card-title"><a href="?command=trips" class="card-title stretched-link">Miles Traveled</a></h5>
-                            <h6 class="card-subtitle mb-2 text-body-secondary">June 2018 - February 2025</h6>
-                            <p class="card-text display-1">23,563</p>
+                            <?php if(!empty($firstTrip)): ?>
+                                <h6 class="card-subtitle mb-2 text-body-secondary"><?php echo $firstTripDate?> - <?php echo date("F j, Y")?></h6>
+                            <?php endif; ?>
+                            <p class="card-text display-1"><?php echo $stats[0]["miles_traveled"]?></p>
                         </div>
                     </div>
                 </div>
@@ -70,8 +74,10 @@
                     <div class="card w-100">
                         <div class="card-body">
                             <h5 class="card-title"><a href="?command=trips" class="card-title stretched-link">Countries Visited</a></h5>
-                            <h6 class="card-subtitle mb-2 text-body-secondary">June 2018 - February 2025</h6>
-                            <p class="card-text display-1">7</p>
+                            <?php if(!empty($firstTrip)): ?>
+                                <h6 class="card-subtitle mb-2 text-body-secondary"><?php echo $firstTripDate?> - <?php echo date("F j, Y")?></h6>
+                            <?php endif; ?>
+                            <p class="card-text display-1"><?php echo $stats[0]["num_countries"]?></p>
                         </div>
                     </div>
                 </div>
@@ -79,8 +85,10 @@
                     <div class="card w-100">
                         <div class="card-body">
                             <h5 class="card-title"><a href="?command=trips" class="card-title stretched-link">Cities Visited</a></h5>
-                            <h6 class="card-subtitle mb-2 text-body-secondary">June 2018 - February 2025</h6>
-                            <p class="card-text display-1">22</p>
+                            <?php if(!empty($firstTrip)): ?>
+                                <h6 class="card-subtitle mb-2 text-body-secondary"><?php echo $firstTripDate?> - <?php echo date("F j, Y")?></h6>
+                            <?php endif; ?>
+                            <p class="card-text display-1"><?php echo $stats[0]["num_cities"]?></p>
                         </div>
                     </div>
                 </div>
