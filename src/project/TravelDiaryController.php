@@ -46,6 +46,9 @@ class TravelDiaryController {
       case "addentry":
         $this->showAddEntry();
         break;
+      case "userinfo":
+        $this->userInfoAPI();
+        break;
       case "logout":
         $this->logout();
         break;
@@ -112,6 +115,17 @@ class TravelDiaryController {
     session_destroy();
     session_start();
     $this->showLogin();
+  }
+
+  public function userInfoAPI() {
+    $result = $this->db->query("select * from project_users where id = $1", $_SESSION["user_id"]);
+    $userInfo = [
+        "name" => $result[0]["name"],
+        "email" => $result[0]["email"],
+        "date_joined" => $result[0]["date_joined"]
+    ];
+    header("Content-Type: application/json");
+    echo(json_encode($userInfo, JSON_PRETTY_PRINT));
   }
   
   public function showLogin($message = "") {
