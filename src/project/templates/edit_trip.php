@@ -57,9 +57,9 @@
                         <div class="mb-3">
                             <label for="collaborators" class="form-label">Collaborators</label>
                             <select id="collaborators" class="form-select" aria-label="collaborators">
-                                <option selected><?php echo $result[0]["collaborators"]?></option>
+                                <option selected><?php echo str_replace(',', ', ', str_replace(["{", "}", "\""], "", $result[0]["collaborators"]))?></option>
                                 <?php foreach($users as $user): ?>
-                                    <option value="<?php echo $user["id"]?>"><?php echo $user["name"];?></option>
+                                    <option><?php echo $user["name"];?></option>
                                 <?php endforeach; ?>
                             </select>
                         </div>

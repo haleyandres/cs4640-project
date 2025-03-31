@@ -50,13 +50,14 @@
                             <div class="card" style="width: 22rem;">
                                 <div class="card-header">
                                     <h5 class="card-title">Trip to <?=$trip["city"]?>, <?=$trip["country"]?></h5>
-                                </div>
-                                <div class="card-body">
-                                    <h6 class="card-subtitle mb-2 text-muted">
+                                    <h6 class="card-subtitle text-muted">
                                         <?= date("F j, Y", strtotime($trip["start_date"])) ?> - 
                                         <?= date("F j, Y", strtotime($trip["end_date"])) ?>
                                     </h6>
-                                    <p class="card-text"><?=$trip["notes"]?></p>
+                                </div>
+                                <div class="card-body">
+                                    <!-- <p class="card-text">With: <?=str_replace(',', ', ', str_replace(["{", "}", "\""], "", $trip["collaborators"]))?></p> -->
+                                    <p class="card-text p-0"> Notes: <?=$trip["notes"]?></p>
                                     <a href="?command=edit_trip&id=<?= $trip['id'] ?>" class="btn btn-sm" style="background-color: gainsboro; color: black;">Edit</a>
                                     <a href="?command=delete_trip&id=<?= $trip['id'] ?>" class="btn btn-sm" style="background-color: gainsboro; color: black;">Delete</a>
                                 </div>

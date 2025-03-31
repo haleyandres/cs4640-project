@@ -50,7 +50,7 @@
                             <div class="card" style="width: 50rem;">
                                 <div class="card-header">
                                     <h5 class="card-title"><?=$entry["title"]?></h5>
-                                    <h6 class="card-subtitle text-body-secondary"><?=$entry["date"]?></h6>
+                                    <h6 class="card-subtitle text-body-secondary"><?=date("F j, Y", strtotime($entry["date"]))?></h6>
                                 </div>
                                 <div class="card-body">
                                     <p class="card-text"><?=$entry["entry"]?></p>
