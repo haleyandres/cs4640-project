@@ -49,14 +49,15 @@
                         <div class="col">
                             <div class="card" style="width: 22rem;">
                                 <div class="card-header">
-                                    <h5 class="card-title">Trip to <?=$trip["city"]?>, <?=$trip["country"]?></h5>
+                                    <h5 class="card-title"><?= $trip["name"] ?></h5>
                                     <h6 class="card-subtitle text-muted">
-                                        <?= date("F j, Y", strtotime($trip["start_date"])) ?> - 
-                                        <?= date("F j, Y", strtotime($trip["end_date"])) ?>
+                                        <?= date("F j, Y", strtotime($trip["start_date"])) ?>
+                                        <?= !empty($trip["end_date"]) ? " - ".date("F j, Y", strtotime($trip["end_date"])) : "" ?>
                                     </h6>
                                 </div>
                                 <div class="card-body">
                                     <!-- <p class="card-text">With: <?=str_replace(',', ', ', str_replace(["{", "}", "\""], "", $trip["collaborators"]))?></p> -->
+                                    <p class="card-text">Trip to <?=$trip["city"]?>, <?=$trip["country"]?></p>
                                     <p class="card-text p-0"> Notes: <?=$trip["notes"]?></p>
                                     <a href="?command=edit_trip&id=<?= $trip['id'] ?>" class="btn btn-sm" style="background-color: gainsboro; color: black;">Edit</a>
                                     <a href="?command=delete_trip&id=<?= $trip['id'] ?>" class="btn btn-sm" style="background-color: gainsboro; color: black;">Delete</a>

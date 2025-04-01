@@ -43,6 +43,12 @@ class TravelDiaryController {
       case "addtrip":
         $this->showAddTrip();
         break;
+      case "create_trip":
+        $this->addTrip();
+        break;
+      case "create_entry":
+        $this->addEntry();
+        break;
       case "addentry":
         $this->showAddEntry();
         break;
@@ -210,11 +216,106 @@ class TravelDiaryController {
   }
 
   public function saveEntryEdits() {
+      if (!isset($_SESSION["user_id"]) || !isset($this->input["entry_id"])) {
+          header("Location: ?command=entries");
+          exit;
+      }
+  
+      $entryId = $this->input["entry_id"];
+      $userId = $_SESSION["user_id"];
+  
+      $result = $this->db->query("SELECT * FROM project_entries WHERE id = $1 AND user_id = $2;", $entryId, $userId);
+  
+      if (empty($result)) {
+          header("Location: ?command=entries");
+          exit;
+      }
+  
+      if (isset($_POST["title"]) && isset($_POST["date"]) && isset($_POST["trip"]) && isset($_POST["entry"]) 
+        && !empty($_POST["title"]) && !empty($_POST["date"]) && !empty($_POST["trip"]) && !empty($_POST["entry"])) {
 
+          $title = $_POST["title"];
+          $date = $_POST["date"];
+          $trip = $_POST["trip"];
+          $entry = $_POST["entry"];
+          $imageUrl = $_POST["image_url"] ?? null;
+
+          $this->db->query("UPDATE project_entries 
+                            SET title = $1, date = $2, trip_id = $3, entry = $4, image_url = $5 
+                            WHERE id = $6 AND user_id = $7;", 
+                            $title, $date, $trip, $entry, $imageUrl, $entryId, $userId);
+  
+          $this->db->query("UPDATE project_stats SET num_entries = num_entries + 1 WHERE user_id = $1;", $userId);
+  
+          header("Location: ?command=entries");
+          exit;
+      } else {
+          $message = "<p class='alert alert-danger'>Please fill out all required fields</p>";
+          $this->showEditTrip();
+      }
   }
 
   public function saveTripEdits() {
+      if (isset($_POST["trip-name"]) && isset($_POST["start-date"]) && isset($_POST["country"]) && isset($_POST["city"]) && isset($_POST["collaborators"]) && isset($_POST["trip-description"]) 
+          && !empty($_POST["trip-name"]) && !empty($_POST["start-date"]) && !empty($_POST["country"]) && !empty($_POST["city"]) && !empty($_POST["collaborators"]) && !empty($_POST["trip-description"])) {
+          
+          if (isset($_POST["trip-id"]) && !empty($_POST["trip-id"])) {
+              $trip_id = $_POST["trip-id"];
+              $result = $this->db->query("UPDATE project_trips 
+                                          SET name = $2, start_date = $3, end_date = $4, country = $5, city = $6, collaborators = $7, notes = $8
+                                          WHERE id = $1 AND user_id = $9;", 
+                                          $trip_id, $_POST["trip-name"], $_POST["start-date"], $_POST["end-date"] ?? null, $_POST["country"], $_POST["city"], "{".$_POST['collaborators']."}", $_POST["trip-description"], $_SESSION["user_id"]);
+          }
 
+          header("Location: ?command=trips");
+          exit;
+
+      } else {
+          $message = "<p class='alert alert-danger'>Please fill out all required fields</p>";
+          $this->showAddTrip();
+      }
+  }
+
+
+  public function addTrip() {
+    if (isset($_POST["trip-name"]) && isset($_POST["start-date"]) && isset($_POST["country"]) && isset($_POST["city"]) && isset($_POST["collaborators"]) && isset($_POST["trip-description"]) 
+    && !empty($_POST["trip-name"]) && !empty($_POST["start-date"]) && !empty($_POST["country"]) && !empty($_POST["city"]) && !empty($_POST["collaborators"]) && !empty($_POST["trip-description"])) {
+        
+      $result = $this->db->query("insert into project_trips (user_id, name, start_date, end_date, country, city, collaborators, notes) values ($1, $2, $3, $4, $5, $6, $7, $8) returning id;",
+        $_SESSION["user_id"], $_POST["trip-name"], $_POST["start-date"], $_POST["end-date"] ?? null, $_POST["country"], $_POST["city"], "{".$_POST['collaborators']."}", $_POST["trip-description"]);
+
+      $stat = $this->db->query("UPDATE project_stats SET num_trips = num_trips + 1 WHERE user_id = $1;", $_SESSION["user_id"]);
+
+      header("Location: ?command=trips");
+      exit;
+
+      $this->showTrips();
+
+      return;
+    } else {
+      $message = "<p class='alert alert-danger'>Please fill out all required fields</p>";
+      $this->showAddTrip();
+    }
+  }
+
+  public function addEntry() {
+    if (isset($_POST["title"]) && isset($_POST["date"]) && isset($_POST["trip"]) && isset($_POST["entry"]) 
+    && !empty($_POST["title"]) && !empty($_POST["date"]) && !empty($_POST["trip"]) && !empty($_POST["entry"])) {
+      $result = $this->db->query("insert into project_entries (user_id, trip_id, date, title, entry) values ($1, $2, $3, $4, $5) returning id;",
+        $_SESSION["user_id"], $_POST["trip"], $_POST["date"], $_POST["title"], $_POST["entry"]);
+
+      $stat = $this->db->query("UPDATE project_stats SET num_entries = num_entries + 1 WHERE user_id = $1;", $_SESSION["user_id"]);
+
+      header("Location: ?command=entries");
+      exit;
+
+      $this->showEntries();
+
+      return;
+    } else {
+      $message = "<p class='alert alert-danger'>Please fill out all required fields</p>";
+      $this->showAddEntry();
+    }
   }
   
   public function showLogin($message = "") {
@@ -240,10 +341,12 @@ class TravelDiaryController {
   }
 
   public function showAddTrip($message = "") {
+    $users = $this->db->query("select name from project_users where id != $1", $_SESSION["user_id"]);
     include("/opt/src/project/templates/add_trip.php");
   }
 
   public function showAddEntry($message = "") {
+    $userTrips = $this->db->query("select * from project_trips where user_id = $1", $_SESSION["user_id"]);
     include("/opt/src/project/templates/add_entry.php");
   }
 

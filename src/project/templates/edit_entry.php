@@ -41,7 +41,7 @@
             <!-- add entry form -->
             <div class="row justify-content-center">
                 <div class="col-6">
-                    <form id="edit-entry-form" action="?command=save_entry_edits">
+                    <form id="edit-entry-form" action="?command=save_entry_edits" method="POST">
                         <div class="mb-3">
                             <label for="title" class="form-label">Title</label>
                             <input type="text" value="<?php echo $result[0]["title"]?>" class="form-control" id="title" name="title" required>
@@ -52,7 +52,7 @@
                                 <option selected><?php echo $trip[0]["city"];?>, <?php echo $trip[0]["country"];?></option>
                                 <?php foreach($userTrips as $userTrip): ?>
                                     <?php if ($userTrip["id"] !== $trip[0]["id"]): ?>
-                                        <option value="<?php echo $userTrip["id"]?>"><?php echo $userTrip["city"];?>, <?php echo $userTrip["country"];?></option>
+                                        <option value="<?php echo $userTrip["id"]?>"><?php echo $userTrip["name"];?>: <?php echo $userTrip["city"];?>, <?php echo $userTrip["country"];?></option>
                                     <?php endif; ?>
                                 <?php endforeach; ?>
                             </select>

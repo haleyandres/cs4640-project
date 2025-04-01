@@ -41,7 +41,8 @@
             <!-- add trip form -->
             <div class="row justify-content-center">
                 <div class="col-6">
-                    <form id="add-trip-form">
+                    <form id="add-trip-form" action="?command=save_trip_edits" method="POST">
+                        <input type="hidden" name="trip-id" value="<?= $trip['id'] ?>">
                         <div class="mb-3">
                             <label for="trip-name" class="form-label">Trip Name</label>
                             <input type="text" value="<?php echo $result[0]["name"]?>" class="form-control" id="trip-name" name="trip-name" required>
@@ -51,8 +52,16 @@
                             <input type="date" value="<?php echo $result[0]["start_date"]?>" class="form-control" id="start-date" name="start-date" required>
                         </div>
                         <div class="mb-3">
-                            <label for="location" class="form-label">Primary Location</label>
-                            <input type="text" value="<?php echo $result[0]["city"]?>, <?php echo $result[0]["country"]?>" class="form-control" id="location" name="location" required>
+                            <label for="end-date" class="form-label">End Date (leave blank if uncertain)</label>
+                            <input type="date" value="<?php echo $result[0]["end_date"]?>" class="form-control" id="end-date" name="end-date">
+                        </div>
+                        <div class="mb-3">
+                            <label for="country" class="form-label">Primary Country</label>
+                            <input type="text" value="<?php echo $result[0]["country"]?>" class="form-control" id="country" name="country" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="city" class="form-label">Primary City</label>
+                            <input type="text" value="<?php echo $result[0]["city"]?>" class="form-control" id="city" name="city" required>
                         </div>
                         <div class="mb-3">
                             <label for="collaborators" class="form-label">Collaborators</label>

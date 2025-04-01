@@ -41,18 +41,19 @@
             <!-- add entry form -->
             <div class="row justify-content-center">
                 <div class="col-6">
-                    <form id="add-trip-form">
+                    <form id="add-entry-form" action="?command=create_entry" method="post">
                         <div class="mb-3">
                             <label for="title" class="form-label">Title</label>
                             <input type="text" class="form-control" id="title" name="title" required>
                         </div>
                         <div class="mb-3">
                             <label for="trip" class="form-label">Trip</label>
-                            <select id="trip" class="form-select" aria-label="trip">
-                                <option selected>Select Trip</option>
-                                <option value="1">Trip 1</option>
-                                <option value="2">Trip 2</option>
-                                <option value="3">Trip 3</option>
+                            <select id="trip" class="form-select" aria-label="trip" name="trip">
+                                <?php foreach($userTrips as $userTrip): ?>
+                                    <?php if ($userTrip["id"] !== $trip[0]["id"]): ?>
+                                        <option value="<?php echo $userTrip["id"]?>"><?php echo $userTrip["name"];?>: <?php echo $userTrip["city"];?>, <?php echo $userTrip["country"];?></option>
+                                    <?php endif; ?>
+                                <?php endforeach; ?>
                             </select>
                         </div>
                         <div class="mb-3">
