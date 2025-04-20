@@ -1,5 +1,5 @@
-img {
-    border: 1px solid #000;
-    border-radius: 8px;
-    width: 100%;
-}
+.leaflet-container .leaflet-tile {
+    border: none !important;
+    image-rendering: pixelated !important;
+  }
+  

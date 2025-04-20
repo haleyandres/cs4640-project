@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+    <!-- sources used: https://leafletjs.com/examples/quick-start/, https://wiki.openstreetmap.org/wiki/API_v0.6 -->
     <head>
         <title>Travel Diary - Map</title>
         <meta charset="utf-8">
@@ -9,8 +10,26 @@
         <meta name="author" content="Haley Andres & Alwyn Dippenaar">
         <meta name="description" content="Document your adventures around the globe.">
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">       
+
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+            integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+            crossorigin=""/>
+        <!-- Make sure you put this AFTER Leaflet's CSS -->
+        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+            integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+            crossorigin=""></script>
+
         <link rel="stylesheet" href="styles/main.css">
-        <link rel="stylesheet" href="styles/map.css">
+        <link rel="stylesheet" href="map.css">
+
+        <script>
+            window.onload = function () {
+                const map = L.map('map').setView([20, 0], 2);
+                L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; OpenStreetMap contributors',
+                }).addTo(map);
+            };
+        </script>
     </head>  
     <body>
         <div class="container">
@@ -38,9 +57,7 @@
             <!-- Main Map -->
             <div class="row my-2">
                 <div class="col-12">
-                    <div id="map">
-                        <img src="media/placeholder-map.png" alt="map of bucket list destinations">
-                    </div>
+                    <div id="map" style="height: 500px; width: 100%"></div>
                 </div>
             </div>
             <!-- add destination button -->
