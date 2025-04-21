@@ -206,6 +206,10 @@ class TravelDiaryController {
     $entryId = $this->input["id"];
     $userId = $_SESSION["user_id"];
     $result = $this->db->query("DELETE FROM project_entries WHERE id = $1 AND user_id = $2;", $entryId, $userId);
+
+    // update stats
+    $this->db->query("update project_stats set num_entries = num_entries - 1 where user_id = $1;", $userId);
+
     header("Location: ?command=entries");
     exit;
   }
