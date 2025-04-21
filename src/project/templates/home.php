@@ -38,8 +38,8 @@
                         if (place.latitude && place.longitude) {
                             L.marker([parseFloat(place.latitude), parseFloat(place.longitude)])
                                 .addTo(map)
-                                .bindPopup(`${place.name}<br>${place.start_date} - ${place.end_date}`);
-                        }
+                                .bindPopup(`${place.name}<br>${formatDate(place.start_date)}${place.end_date ? ' - ' + formatDate(place.end_date) : ''}`);
+                            }
                     });
                 }
                 
@@ -58,6 +58,12 @@
                         }
                     });
                 }
+            }
+
+            function formatDate (dateStr) {
+                if (!dateStr) return null;
+                const date = new Date(dateStr + 'T00:00:00');
+                return date.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
             }
 
             document.addEventListener('DOMContentLoaded', () => {
