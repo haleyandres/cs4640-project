@@ -42,17 +42,18 @@
             <div class="row justify-content-center">
                 <div class="col-6">
                     <form id="edit-entry-form" action="?command=save_entry_edits" method="POST">
+                        <input type="hidden" name="entry_id" value="<?= $entryId ?>">
                         <div class="mb-3">
                             <label for="title" class="form-label">Title</label>
                             <input type="text" value="<?php echo $result[0]["title"]?>" class="form-control" id="title" name="title" required>
                         </div>
                         <div class="mb-3">
                             <label for="trip" class="form-label">Trip</label>
-                            <select id="trip" class="form-select" aria-label="trip">
-                                <option selected><?php echo $trip[0]["city"];?>, <?php echo $trip[0]["country"];?></option>
+                            <select id="trip" name="trip" class="form-select" aria-label="trip">
+                                <option selected value="<?php echo $trip[0]["id"]?>"><?php echo $trip[0]["name"];?> - <?php echo $trip[0]["location"];?></option>
                                 <?php foreach($userTrips as $userTrip): ?>
                                     <?php if ($userTrip["id"] !== $trip[0]["id"]): ?>
-                                        <option value="<?php echo $userTrip["id"]?>"><?php echo $userTrip["name"];?>: <?php echo $userTrip["city"];?>, <?php echo $userTrip["country"];?></option>
+                                        <option value="<?php echo $userTrip["id"]?>"><?php echo $userTrip["name"];?> - <?php echo $userTrip["location"];?></option>
                                     <?php endif; ?>
                                 <?php endforeach; ?>
                             </select>

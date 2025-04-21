@@ -54,8 +54,15 @@
                                 </div>
                                 <div class="card-body">
                                     <p class="card-text"><?=$entry["entry"]?></p>
-                                    <a href="?command=edit_entry&id=<?= $entry['id'] ?>" class="btn btn-sm" style="background-color: gainsboro; color: black;">Edit</a>
-                                    <a href="?command=delete_entry&id=<?= $entry['id'] ?>" class="btn btn-sm" style="background-color: gainsboro; color: black;">Delete</a>
+                                    <div class="d-flex justify-content-between">
+                                        <div>
+                                            <a href="?command=edit_entry&id=<?= $entry['id'] ?>" class="btn btn-sm" style="background-color: gainsboro; color: black;">Edit</a>
+                                            <a href="?command=delete_entry&id=<?= $entry['id'] ?>" class="btn btn-sm" style="background-color: gainsboro; color: black;">Delete</a>
+                                        </div>
+                                        <div>
+                                            <p><?= htmlspecialchars($entry["location"]) ?></p>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>

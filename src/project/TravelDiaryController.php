@@ -250,12 +250,12 @@ class TravelDiaryController {
   }
 
   public function saveEntryEdits() {
-      if (!isset($_SESSION["user_id"]) || !isset($this->input["entry_id"])) {
+      if (!isset($_SESSION["user_id"]) || !isset($_POST["entry_id"])) {
           header("Location: ?command=entries");
           exit;
       }
   
-      $entryId = $this->input["entry_id"];
+      $entryId = $_POST["entry_id"];
       $userId = $_SESSION["user_id"];
   
       $result = $this->db->query("SELECT * FROM project_entries WHERE id = $1 AND user_id = $2;", $entryId, $userId);
@@ -274,18 +274,15 @@ class TravelDiaryController {
           $entry = $_POST["entry"];
           $imageUrl = $_POST["image_url"] ?? null;
 
-          $this->db->query("UPDATE project_entries 
+          $result = $this->db->query("UPDATE project_entries 
                             SET title = $1, date = $2, trip_id = $3, entry = $4, image_url = $5 
                             WHERE id = $6 AND user_id = $7;", 
                             $title, $date, $trip, $entry, $imageUrl, $entryId, $userId);
-  
-          $this->db->query("UPDATE project_stats SET num_entries = num_entries + 1 WHERE user_id = $1;", $userId);
-  
           header("Location: ?command=entries");
           exit;
       } else {
           $message = "<p class='alert alert-danger'>Please fill out all required fields</p>";
-          $this->showEditTrip();
+          $this->showEditEntry();
       }
   }
 
@@ -477,7 +474,14 @@ class TravelDiaryController {
   }
 
   public function showEntries($message = "") {
-    $entries = $this->db->query("select * from project_entries where user_id = $1 order by date desc;", $_SESSION["user_id"]);
+    $entries = $this->db->query(
+      "SELECT e.*, t.location 
+       FROM project_entries e 
+       JOIN project_trips t ON e.trip_id = t.id 
+       WHERE e.user_id = $1 
+       ORDER BY e.date DESC;",
+      $_SESSION["user_id"]
+    );
     include("/opt/src/project/templates/entries.php");
   }
 

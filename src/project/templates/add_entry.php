@@ -51,7 +51,7 @@
                             <select id="trip" class="form-select" aria-label="trip" name="trip">
                                 <?php foreach($userTrips as $userTrip): ?>
                                     <?php if ($userTrip["id"] !== $trip[0]["id"]): ?>
-                                        <option value="<?php echo $userTrip["id"]?>"><?php echo $userTrip["name"];?>: <?php echo $userTrip["location"];?></option>
+                                        <option value="<?php echo $userTrip["id"]?>"><?php echo $userTrip["name"];?> - <?php echo $userTrip["location"];?></option>
                                     <?php endif; ?>
                                 <?php endforeach; ?>
                             </select>
