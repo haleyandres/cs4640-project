@@ -18,6 +18,7 @@
     $res  = pg_query($dbHandle, "drop table if exists project_trips cascade;");
     $res  = pg_query($dbHandle, "drop table if exists project_entries cascade;");
     $res  = pg_query($dbHandle, "drop table if exists project_stats cascade;");
+    $res  = pg_query($dbHandle, "drop table if exists project_bucketlist cascade;");
 
     $res  = pg_query($dbHandle, "drop sequence if exists project_users_seq;");
     $res  = pg_query($dbHandle, "drop sequence if exists project_trips_seq;");
@@ -40,12 +41,11 @@
     $res  = pg_query($dbHandle, "create table project_trips (
             id  int primary key default nextval('project_trips_seq'),
             user_id int references project_users(id) on delete cascade,
-            name text,
-            longitude double precision,
-            latitude double precision,
-            city text,
-            country text,
-            start_date date,
+            name text unique not null,
+            location text not null,
+            latitude double precision not null,
+            longitude double precision not null,
+            start_date date default current_date,
             end_date date,
             collaborators text[],
             notes text
@@ -66,9 +66,17 @@
             num_trips int default 0,
             num_entries int default 0,
             num_visited int default 0,
+            num_bucketlist int default 0,
             num_cities int default 0,
             num_countries int default 0,
             miles_traveled int default 0
+            );");
+
+    $res = pg_query($dbHandle, "create table project_bucketlist (
+            user_id int references project_users(id) on delete cascade,
+            location text unique,
+            latitude double precision unique,
+            longitude double precision unique
             );");
 
     echo "Done!";

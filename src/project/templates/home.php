@@ -23,15 +23,99 @@
         <link rel="stylesheet" href="map.css">
 
         <script>
-            window.onload = function () {
+            function loadMap() {
                 const map = L.map('map').setView([20, 0], 2);
                 L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '&copy; OpenStreetMap contributors',
+                    attribution: '&copy; OpenStreetMap contributors',
                 }).addTo(map);
-            };
+            }
+
+            document.addEventListener('DOMContentLoaded', () => {
+                const input = document.getElementById('location');
+                const suggestions = document.getElementById('suggestions');
+                const submit = document.getElementById('add-location');
+                let selectedPlace = null;
+
+                input.addEventListener('input', debounce(async () => {
+                    const query = input.value.trim();
+                    if (query.length < 3) return suggestions.innerHTML = '';
+
+                    const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&addressdetails=1&limit=5`);
+                    const data = await res.json();
+                    showSuggestions(data);
+                }, 150));
+
+                function showSuggestions(results) {
+                    suggestions.innerHTML = '';
+                    results.forEach(place => {
+                        const li = document.createElement('li');
+                        li.textContent = place.display_name;
+                        li.className = 'list-group-item list-group-item-action';
+                        li.style.cursor = 'pointer';
+                        li.addEventListener('click', () => selectPlace(place));
+                        suggestions.appendChild(li);
+                    });
+                }
+
+                function selectPlace(place) {
+                    const city = place.address.city || place.address.town || place.address.village || '';
+                    const state = place.address.state;
+                    const country = place.address.country;
+                    input.value = `${city}, ${state}, ${country}`;
+                    selectedPlace = {
+                        city,
+                        state,
+                        country,
+                        lat: place.lat,
+                        lon: place.lon
+                    };
+                    suggestions.innerHTML = '';
+                }
+
+                submit.addEventListener('click', async () => {
+                    if (!selectedPlace) {
+                        alert("Please choose a location from the suggestions.");
+                        return;
+                    }
+
+                    const data = {
+                        display_name: input.value,
+                        lat: selectedPlace.lat,
+                        lon: selectedPlace.lon
+                    };
+
+                    const response = await fetch('?command=add_bucketlist', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(data)
+                    });
+
+                    const result = await response.json();
+                    const responseMessage = document.getElementById('response');
+                    responseMessage.textContent = result.message;
+                    if (result.status === "error") {
+                        responseMessage.classList.remove('text-success');
+                        responseMessage.classList.add("text-danger");
+                    } else {
+                        responseMessage.classList.remove('text-danger');
+                        responseMessage.classList.add("text-success");
+                    }
+                    selectedPlace = null;
+                    input.value = '';
+                });
+
+                function debounce(func, delay) {
+                    let timer;
+                    return function (...args) {
+                        clearTimeout(timer);
+                        timer = setTimeout(() => func.apply(this, args), delay);
+                    };
+                }
+            });
+
         </script>
     </head>  
-    <body>
+    <body onload="loadMap();">
         <div class="container">
             <!-- site title -->
             <div class="row title">
@@ -61,10 +145,19 @@
                 </div>
             </div>
             <!-- add destination button -->
+            <p class="mb-1">Add a bucket list destination</p>
+            <div class="row position-relative">
+                <div class="col-5 d-flex justify-content-end position-relative">
+                    <div class="w-100 position-relative">
+                        <input type="text" id="location" class="form-control" placeholder="city, state, country" autocomplete="off">
+                        <ul id="suggestions" class="list-group position-absolute w-100 z-3 overflow-auto" style="max-height: 200px;"></ul>
+                    </div>
+                    <button type="submit" id="add-location" class="btn btn-secondary ms-2">Add</button>
+                </div>
+            </div>
             <div class="row">
-                <div class="col-4 d-flex justify-content-end">
-                    <input type="text" id="location" class="form-control me-2" placeholder="Add a Bucket List Destination">
-                    <button type="submit" class="btn btn-secondary me-4" id="add-location">Add</button>
+                <div class="col-12">
+                    <p id="response" class="my-3"></p>
                 </div>
             </div>
             <!-- site footer -->

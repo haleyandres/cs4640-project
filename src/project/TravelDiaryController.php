@@ -70,6 +70,9 @@ class TravelDiaryController {
       case "save_trip_edits":
         $this->saveTripEdits();
         break;
+      case "add_bucketlist":
+        $this->addBucketListTrip();
+        break;
       case "userinfo":
         $this->userInfoAPI();
         break;
@@ -316,6 +319,36 @@ class TravelDiaryController {
       $message = "<p class='alert alert-danger'>Please fill out all required fields</p>";
       $this->showAddEntry();
     }
+  }
+
+  function addBucketListTrip() {
+    $userId = $_SESSION["user_id"];
+
+    $input = json_decode(file_get_contents('php://input'), true);
+
+    if (!isset($input['display_name'], $input['lat'], $input['lon'])) {
+        echo json_encode(['message' => 'Invalid location data']);
+        return;
+    }
+
+    $location = htmlspecialchars($input['display_name']);
+    $latitude = floatval($input['lat']);
+    $longitude = floatval($input['lon']);
+
+    // check if location already in bucket list
+    $results = $this->db->query("select location from project_bucketlist where user_id = $1;", $userId);
+    foreach ($results as $record) {
+      if ($record["location"] === $location) {
+        echo json_encode(['status' => 'error', 'message' => 'Location already on bucket list.']);
+        return;
+      }
+    }
+
+    // insert bucket list destination
+    $this->db->query("insert into project_bucketlist (user_id, location, latitude, longitude) values ($1, $2, $3, $4);", $userId, $location, $latitude, $longitude);
+    // update number of bucket list destinations in user stats
+    $this->db->query("update project_stats set num_bucketlist = num_bucketlist + 1 where user_id = $1;", $userId);
+    echo json_encode(['status' => 'success', 'message' => 'Location added successfully!']);
   }
   
   public function showLogin($message = "") {
