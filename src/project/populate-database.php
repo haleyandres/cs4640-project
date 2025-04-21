@@ -74,9 +74,9 @@
 
     $res = pg_query($dbHandle, "create table project_bucketlist (
             user_id int references project_users(id) on delete cascade,
-            location text unique,
-            latitude double precision unique,
-            longitude double precision unique,
+            location text,
+            latitude double precision,
+            longitude double precision,
             visited boolean default false
             );");
 

@@ -116,6 +116,7 @@
                         <div class="mb-3">
                             <label for="collaborators" class="form-label">Collaborators</label>
                             <select id="collaborators" class="form-select" aria-label="collaborators">
+                                <option value="">None</option>
                                 <?php foreach($users as $user): ?>
                                     <option><?php echo $user["name"];?></option>
                                 <?php endforeach; ?>

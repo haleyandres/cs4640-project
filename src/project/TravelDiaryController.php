@@ -415,7 +415,6 @@ class TravelDiaryController {
 
   function addBucketListTrip() {
     $userId = $_SESSION["user_id"];
-
     $input = json_decode(file_get_contents('php://input'), true);
 
     if (!isset($input['display_name'], $input['lat'], $input['lon'])) {

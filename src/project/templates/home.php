@@ -25,9 +25,15 @@
         <script>
             const tripLocations = <?= $trips ?>;
             const bucketListLocations = <?= $bucketlist ?>; 
+            let map;
+
+            const bucketListIcon = L.icon({
+                    iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',
+                    iconAnchor: [15, 40],
+                });
 
             function loadMap() {
-                const map = L.map('map').setView([20, 0], 2);
+                map = L.map('map').setView([20, 0], 2);
                 L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
                     attribution: '&copy; OpenStreetMap contributors',
                 }).addTo(map);
@@ -44,11 +50,6 @@
                 }
                 
                 // add red marker for each unvisited location in bucket list
-                const bucketListIcon = L.icon({
-                    iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',
-                    iconAnchor: [15, 40],
-                });
-
                 if(bucketListLocations.length !== 0) {
                     bucketListLocations.forEach(place => {
                         if (place.latitude && place.longitude) {
@@ -130,6 +131,15 @@
                     } else {
                         responseMessage.classList.remove('text-danger');
                         responseMessage.classList.add("text-success");
+
+                        // add new marker for bucket list destination
+                        const redIcon = L.icon({
+                            iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',
+                            iconAnchor: [15, 40],
+                        });
+                        L.marker([parseFloat(data.lat), parseFloat(data.lon)],
+                                {icon: bucketListIcon})
+                                .addTo(map);
                     }
                     selectedPlace = null;
                     input.value = '';
