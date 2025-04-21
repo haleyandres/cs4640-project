@@ -23,11 +23,41 @@
         <link rel="stylesheet" href="map.css">
 
         <script>
+            const tripLocations = <?= $trips ?>;
+            const bucketListLocations = <?= $bucketlist ?>; 
+
             function loadMap() {
                 const map = L.map('map').setView([20, 0], 2);
                 L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
                     attribution: '&copy; OpenStreetMap contributors',
                 }).addTo(map);
+
+                // add blue marker + pop up for each location in trips
+                if(tripLocations.length !== 0) {
+                    tripLocations.forEach(place => {
+                        if (place.latitude && place.longitude) {
+                            L.marker([parseFloat(place.latitude), parseFloat(place.longitude)])
+                                .addTo(map)
+                                .bindPopup(`${place.name}<br>${place.start_date} - ${place.end_date}`);
+                        }
+                    });
+                }
+                
+                // add red marker for each unvisited location in bucket list
+                const bucketListIcon = L.icon({
+                    iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',
+                    iconAnchor: [15, 40],
+                });
+
+                if(bucketListLocations.length !== 0) {
+                    bucketListLocations.forEach(place => {
+                        if (place.latitude && place.longitude) {
+                            L.marker([parseFloat(place.latitude), parseFloat(place.longitude)],
+                                {icon: bucketListIcon})
+                                .addTo(map)
+                        }
+                    });
+                }
             }
 
             document.addEventListener('DOMContentLoaded', () => {

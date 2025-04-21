@@ -425,6 +425,10 @@ class TravelDiaryController {
   }
 
   public function showHome($message = "") {
+    $userId = $_SESSION['user_id'];
+    $trips = json_encode($this->db->query("select * from project_trips where user_id = $1;", $userId));
+    $bucketlist = json_encode($this->db->query("select * FROM project_bucketlist where user_id = $1 and visited = false;", $userId));
+
     include("/opt/src/project/templates/home.php");
   }
 
