@@ -88,14 +88,9 @@
                 }
 
                 function selectPlace(place) {
-                    const city = place.address.city || place.address.town || place.address.village || '';
-                    const state = place.address.state;
-                    const country = place.address.country;
-                    input.value = `${city}, ${state}, ${country}`;
+                    input.value = place.display_name;
                     selectedPlace = {
-                        city,
-                        state,
-                        country,
+                        location: place.display_name,
                         lat: place.lat,
                         lon: place.lon
                     };
@@ -179,7 +174,7 @@
             <div class="row position-relative">
                 <div class="col-5 d-flex justify-content-end position-relative">
                     <div class="w-100 position-relative">
-                        <input type="text" id="location" class="form-control" placeholder="city, state, country" autocomplete="off">
+                        <input type="text" id="location" class="form-control" autocomplete="off">
                         <ul id="suggestions" class="list-group position-absolute w-100 z-3 overflow-auto" style="max-height: 200px;"></ul>
                     </div>
                     <button type="submit" id="add-location" class="btn btn-secondary ms-2">Add</button>

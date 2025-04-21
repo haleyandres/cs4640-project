@@ -39,18 +39,13 @@
                 }
 
                 function selectPlace(place) {
-                    const city = place.address.city || place.address.town || place.address.village || '';
-                    const state = place.address.state;
-                    const country = place.address.country;
-                    input.value = `${city}, ${state}, ${country}`;
+                    input.value = place.display_name;
                     selectedPlace = {
-                        city,
-                        state,
-                        country,
+                        location: place.display_name,
                         lat: place.lat,
                         lon: place.lon
                     };
-                    document.getElementById('location').value = input.value;
+                    document.getElementById('location').value = place.display_name;
                     document.getElementById('latitude').value = place.lat;
                     document.getElementById('longitude').value = place.lon;
                     suggestions.innerHTML = '';
@@ -112,7 +107,7 @@
                         </div>
                         <div class="mb-3">
                             <label for="location" class="form-label">Location</label>
-                            <input type="text" class="form-control" id="location-input" name="location-input" placeholder="City, State, Country" autocomplete="off" required>
+                            <input type="text" class="form-control" id="location-input" name="location-input" autocomplete="off" required>
                             <ul id="suggestions" class="list-group position-absolute w-100 z-3 overflow-auto" style="max-height: 200px;"></ul>
                             <input type="hidden" id="location" name="location">
                             <input type="hidden" id="latitude" name="latitude">

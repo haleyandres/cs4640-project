@@ -10,6 +10,69 @@
         <meta name="description" content="Document your adventures around the globe.">
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">       
         <link rel="stylesheet" href="styles/main.css">
+    
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                const input = document.getElementById('location-input');
+                const suggestions = document.getElementById('suggestions');
+                let selectedPlace = null;
+
+                // fill hidden fields
+                const locationHidden = document.getElementById('location');
+                const latHidden = document.getElementById('latitude');
+                const lonHidden = document.getElementById('longitude');
+
+                if (!locationHidden.value) {
+                    locationHidden.value = input.value;
+                    latHidden.value = "<?= $result[0]['latitude'] ?>";
+                    lonHidden.value = "<?= $result[0]['longitude'] ?>";
+                }
+
+
+                input.addEventListener('input', debounce(async () => {
+                    const query = input.value.trim();
+                    if (query.length < 3) return suggestions.innerHTML = '';
+
+                    const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&addressdetails=1&limit=5`);
+                    const data = await res.json();
+                    showSuggestions(data);
+                }, 150));
+
+                function showSuggestions(results) {
+                    suggestions.innerHTML = '';
+                    results.forEach(place => {
+                        const li = document.createElement('li');
+                        li.textContent = place.display_name;
+                        li.className = 'list-group-item list-group-item-action';
+                        li.style.cursor = 'pointer';
+                        li.addEventListener('click', () => selectPlace(place));
+                        suggestions.appendChild(li);
+                    });
+                }
+
+                function selectPlace(place) {
+                    input.value = place.display_name;
+                    selectedPlace = {
+                        location: place.display_name,
+                        lat: place.lat,
+                        lon: place.lon
+                    };
+                    document.getElementById('location').value = place.display_name;
+                    document.getElementById('latitude').value = place.lat;
+                    document.getElementById('longitude').value = place.lon;
+                    suggestions.innerHTML = '';
+                }
+
+                function debounce(func, delay) {
+                    let timer;
+                    return function (...args) {
+                        clearTimeout(timer);
+                        timer = setTimeout(() => func.apply(this, args), delay);
+                    };
+                }
+            });
+        </script>
+    
     </head>  
     <body>
         <div class="container">
@@ -42,7 +105,7 @@
             <div class="row justify-content-center">
                 <div class="col-6">
                     <form id="add-trip-form" action="?command=save_trip_edits" method="POST">
-                        <input type="hidden" name="trip-id" value="<?= $trip['id'] ?>">
+                        <input type="hidden" name="trip-id" value="<?= $tripId ?>">
                         <div class="mb-3">
                             <label for="trip-name" class="form-label">Trip Name</label>
                             <input type="text" value="<?php echo $result[0]["name"]?>" class="form-control" id="trip-name" name="trip-name" required>
@@ -52,31 +115,31 @@
                             <input type="date" value="<?php echo $result[0]["start_date"]?>" class="form-control" id="start-date" name="start-date" required>
                         </div>
                         <div class="mb-3">
-                            <label for="end-date" class="form-label">End Date (leave blank if uncertain)</label>
+                            <label for="end-date" class="form-label">End Date (optional)</label>
                             <input type="date" value="<?php echo $result[0]["end_date"]?>" class="form-control" id="end-date" name="end-date">
                         </div>
                         <div class="mb-3">
-                            <label for="country" class="form-label">Primary Country</label>
-                            <input type="text" value="<?php echo $result[0]["country"]?>" class="form-control" id="country" name="country" required>
+                            <label for="location" class="form-label">Location</label>
+                            <input type="text" value="<?php echo $result[0]["location"]?>" class="form-control" id="location-input" name="location-input" required>
+                            <ul id="suggestions" class="list-group position-absolute w-100 z-3 overflow-auto" style="max-height: 200px;"></ul>
+                            <input type="hidden" id="location" name="location">
+                            <input type="hidden" id="latitude" name="latitude">
+                            <input type="hidden" id="longitude" name="longitude">
                         </div>
                         <div class="mb-3">
-                            <label for="city" class="form-label">Primary City</label>
-                            <input type="text" value="<?php echo $result[0]["city"]?>" class="form-control" id="city" name="city" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="collaborators" class="form-label">Collaborators</label>
-                            <select id="collaborators" class="form-select" aria-label="collaborators">
-                                <option selected><?php echo str_replace(',', ', ', str_replace(["{", "}", "\""], "", $result[0]["collaborators"]))?></option>
+                            <label for="collaborators" class="form-label">Collaborators (optional)</label>
+                            <select id="collaborators" name="collaborators" class="form-select" aria-label="collaborators">
+                                <option selected><?php if(!empty($result[0]["collaborators"])) echo str_replace(',', ', ', str_replace(["{", "}", "\""], "", $result[0]["collaborators"]))?></option>
                                 <?php foreach($users as $user): ?>
                                     <option><?php echo $user["name"];?></option>
                                 <?php endforeach; ?>
                             </select>
                         </div>
                         <div class="mb-3">
-                            <label for="trip-description" class="form-label">Description</label>
-                            <textarea class="form-control" id="trip-description" name="trip-description" rows="3" required><?php echo $result[0]["notes"]?></textarea>
+                            <label for="trip-description" class="form-label">Description (optional)</label>
+                            <textarea class="form-control" id="trip-description" name="trip-description" rows="3"><?php echo $result[0]["notes"]?></textarea>
                         </div>
-                        <button type="submit" class="btn btn-secondary">Add Trip</button>
+                        <button type="submit" class="btn btn-secondary">Save Edits</button>
                     </form>
                 </div>
             </div>
