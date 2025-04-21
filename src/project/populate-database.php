@@ -41,7 +41,7 @@
     $res  = pg_query($dbHandle, "create table project_trips (
             id  int primary key default nextval('project_trips_seq'),
             user_id int references project_users(id) on delete cascade,
-            name text unique not null,
+            name text not null,
             location text not null,
             latitude double precision not null,
             longitude double precision not null,
@@ -65,8 +65,8 @@
             user_id int references project_users(id) on delete cascade,
             num_trips int default 0,
             num_entries int default 0,
-            num_visited int default 0,
             num_bucketlist int default 0,
+            num_visited int default 0,
             num_cities int default 0,
             num_countries int default 0,
             miles_traveled int default 0
@@ -76,7 +76,8 @@
             user_id int references project_users(id) on delete cascade,
             location text unique,
             latitude double precision unique,
-            longitude double precision unique
+            longitude double precision unique,
+            visited boolean default false
             );");
 
     echo "Done!";

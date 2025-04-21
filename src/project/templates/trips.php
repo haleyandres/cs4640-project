@@ -57,7 +57,7 @@
                                 </div>
                                 <div class="card-body">
                                     <!-- <p class="card-text">With: <?=str_replace(',', ', ', str_replace(["{", "}", "\""], "", $trip["collaborators"]))?></p> -->
-                                    <p class="card-text">Trip to <?=$trip["city"]?>, <?=$trip["country"]?></p>
+                                    <p class="card-text">Trip to <?=$trip["location"]?></p>
                                     <p class="card-text p-0"> Notes: <?=$trip["notes"]?></p>
                                     <a href="?command=edit_trip&id=<?= $trip['id'] ?>" class="btn btn-sm" style="background-color: gainsboro; color: black;">Edit</a>
                                     <a href="?command=delete_trip&id=<?= $trip['id'] ?>" class="btn btn-sm" style="background-color: gainsboro; color: black;">Delete</a>

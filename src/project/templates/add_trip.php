@@ -10,6 +10,62 @@
         <meta name="description" content="Document your adventures around the globe.">
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">       
         <link rel="stylesheet" href="styles/main.css">
+
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                const input = document.getElementById('location-input');
+                const suggestions = document.getElementById('suggestions');
+                let selectedPlace = null;
+
+                input.addEventListener('input', debounce(async () => {
+                    const query = input.value.trim();
+                    if (query.length < 3) return suggestions.innerHTML = '';
+
+                    const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&addressdetails=1&limit=5`);
+                    const data = await res.json();
+                    showSuggestions(data);
+                }, 150));
+
+                function showSuggestions(results) {
+                    suggestions.innerHTML = '';
+                    results.forEach(place => {
+                        const li = document.createElement('li');
+                        li.textContent = place.display_name;
+                        li.className = 'list-group-item list-group-item-action';
+                        li.style.cursor = 'pointer';
+                        li.addEventListener('click', () => selectPlace(place));
+                        suggestions.appendChild(li);
+                    });
+                }
+
+                function selectPlace(place) {
+                    const city = place.address.city || place.address.town || place.address.village || '';
+                    const state = place.address.state;
+                    const country = place.address.country;
+                    input.value = `${city}, ${state}, ${country}`;
+                    selectedPlace = {
+                        city,
+                        state,
+                        country,
+                        lat: place.lat,
+                        lon: place.lon
+                    };
+                    document.getElementById('location').value = input.value;
+                    document.getElementById('latitude').value = place.lat;
+                    document.getElementById('longitude').value = place.lon;
+                    suggestions.innerHTML = '';
+                }
+
+                function debounce(func, delay) {
+                    let timer;
+                    return function (...args) {
+                        clearTimeout(timer);
+                        timer = setTimeout(() => func.apply(this, args), delay);
+                    };
+                }
+            });
+        </script>
+
     </head>  
     <body>
         <div class="container">
@@ -55,12 +111,12 @@
                             <input type="date" class="form-control" id="end-date" name="end-date">
                         </div>
                         <div class="mb-3">
-                            <label for="country" class="form-label">Primary Country</label>
-                            <input type="text" class="form-control" id="country" name="country" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="city" class="form-label">Primary City</label>
-                            <input type="text" class="form-control" id="city" name="city" required>
+                            <label for="location" class="form-label">Location</label>
+                            <input type="text" class="form-control" id="location-input" name="location-input" placeholder="City, State, Country" autocomplete="off" required>
+                            <ul id="suggestions" class="list-group position-absolute w-100 z-3 overflow-auto" style="max-height: 200px;"></ul>
+                            <input type="hidden" id="location" name="location">
+                            <input type="hidden" id="latitude" name="latitude">
+                            <input type="hidden" id="longitude" name="longitude">
                         </div>
                         <div class="mb-3">
                             <label for="collaborators" class="form-label">Collaborators</label>
@@ -72,7 +128,7 @@
                         </div>
                         <div class="mb-3">
                             <label for="trip-description" class="form-label">Description</label>
-                            <textarea class="form-control" id="trip-description" name="trip-description" rows="3" required></textarea>
+                            <textarea class="form-control" id="trip-description" name="trip-description" rows="3"></textarea>
                         </div>
                         <button type="submit" class="btn btn-secondary">Add Trip</button>
                     </form>
