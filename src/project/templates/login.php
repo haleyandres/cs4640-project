@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        <!-- https://cs4640.cs.virginia.edu/mqp8th/project/index.html -->
+        <!-- https://cs4640.cs.virginia.edu/mqp8th/project/ -->
         <title>Travel Diary</title>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">

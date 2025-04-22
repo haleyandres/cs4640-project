@@ -501,6 +501,11 @@ class TravelDiaryController {
     if(!empty($firstTrip)) {
         $firstTripDate = date("F j, Y", strtotime($firstTrip[0]['start_date']));
     }
+
+    $trips = json_encode($this->db->query("select * from project_trips where user_id = $1;", $userId));
+    $bucketlist = json_encode($this->db->query("select * FROM project_bucketlist where user_id = $1;", $userId));
+    $bucketlistComplete = json_encode($this->db->query("select * FROM project_bucketlist where user_id = $1 and visited = true;", $userId));
+
     include("/opt/src/project/templates/stats.php");
   }
 }

@@ -10,6 +10,39 @@
         <meta name="description" content="Document your adventures around the globe.">
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">       
         <link rel="stylesheet" href="styles/main.css">
+
+        <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+        <script>
+        $(document).ready(function() {
+            function sortTrips(ascending) {
+                const cards = $(".card").get();
+
+                cards.sort(function(first, second) {
+                    const date1 = new Date($(first).find(".card-subtitle").text().split(" - ")[0]);
+                    const date2 = new Date($(second).find(".card-subtitle").text().split(" - ")[0]);
+
+                    let sorted;
+                    if (ascending) {
+                        sorted = date1 - date2;
+                    } else {
+                        sorted = date2 - date1;
+                    }
+                    return sorted;
+                });
+
+                const container = $(".row-cols-1");
+                $.each(cards, function(index, card) {
+                    container.append($(card).closest(".col"));
+                });
+            }
+
+            $("#sort-select").change(function() {
+                const sortOrder = $(this).val();
+                sortTrips(sortOrder === "asc");
+            });
+        });
+        </script>
+
     </head>  
     <body>
         <div class="container">
@@ -45,6 +78,15 @@
                         <a class="btn btn-outline-dark" id="add-button" href="?command=addtrip" role="button">+</a>
                     </div>
                     <!-- trip cards -->
+                    <div class="row mb-3">
+                        <div class="col-auto">
+                            <label for="sort-select" class="form-label">Sort by:</label>
+                            <select class="form-select form-select-sm" id="sort-select">
+                                <option value="desc" selected>Newest First</option>
+                                <option value="asc">Oldest First</option>
+                            </select>
+                        </div>
+                    </div>
                     <?php foreach ($trips as $trip): ?>
                         <div class="col">
                             <div class="card" style="width: 22rem;">
