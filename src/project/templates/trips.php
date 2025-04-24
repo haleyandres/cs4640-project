@@ -67,26 +67,34 @@
                     </div>
                 </div>
             </nav>
-            <!-- page title -->
-            <div class="row title my-4">
-                <h1>My Trips</h1>
-            </div>
-            <?php if(!empty($trips)): ?>
-                <div class="row row-cols-1 row-cols-md-2 mx-5">
-                    <!-- add button -->
-                    <div class="col">
-                        <a class="btn btn-outline-dark" id="add-button" href="?command=addtrip" role="button">+</a>
+            <div class="row row-cols-3">
+                <div class="col"></div>
+                <!-- page title -->
+                <div class="col px-5">
+                    <div class="title my-4">
+                        <h1>My Trips</h1>
                     </div>
-                    <!-- trip cards -->
-                    <div class="row mb-3">
-                        <div class="col-auto">
-                            <label for="sort-select" class="form-label">Sort by:</label>
-                            <select class="form-select form-select-sm" id="sort-select">
+                </div>
+                <!-- sort by -->
+                <div class="col ps-5">
+                    <div class="my-5 justify-content-end">
+                        <div class="d-flex align-items-center">
+                            <label for="sort-select" style="white-space: nowrap;" class="form-label mb-0 me-2 ps-5">Sort by:</label>
+                            <select class="form-select form-select-sm me-5" id="sort-select">
                                 <option value="desc" selected>Newest First</option>
                                 <option value="asc">Oldest First</option>
                             </select>
                         </div>
                     </div>
+                </div>
+            </div>
+            <?php if(!empty($trips)): ?>
+                <div class="row row-cols-1 row-cols-md-2 mx-5 mt-2">
+                    <!-- add button -->
+                    <div class="col">
+                        <a class="btn btn-outline-dark" id="add-button" href="?command=addtrip" role="button">+</a>
+                    </div>
+                    <!-- trip cards -->
                     <?php foreach ($trips as $trip): ?>
                         <div class="col">
                             <div class="card" style="width: 22rem;">
