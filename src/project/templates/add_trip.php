@@ -112,8 +112,10 @@
                         </div>
                         <div class="mb-3">
                             <label for="location" class="form-label">Location</label>
-                            <input type="text" class="form-control" id="location-input" name="location-input" autocomplete="off" required>
-                            <ul id="suggestions" class="list-group position-absolute w-100 z-3 overflow-auto" style="max-height: 200px;"></ul>
+                            <div class="position-relative">
+                                <input type="text" class="form-control" id="location-input" name="location-input" autocomplete="off" required>
+                                <ul id="suggestions" class="list-group position-absolute w-100 z-3 overflow-auto" style="max-height: 200px;"></ul>
+                            </div>
                             <input type="hidden" id="location" name="location">
                             <input type="hidden" id="latitude" name="latitude">
                             <input type="hidden" id="longitude" name="longitude">
