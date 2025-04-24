@@ -20,7 +20,6 @@
             crossorigin=""></script>
 
         <link rel="stylesheet" href="styles/main.css">
-        <link rel="stylesheet" href="map.css">
 
         <script>
             const tripLocations = <?= $trips ?>;

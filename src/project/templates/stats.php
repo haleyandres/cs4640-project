@@ -151,11 +151,11 @@
                 <div class="col stats-card-col d-flex align-items-stretch">
                     <div class="card w-100">
                         <div class="card-body">
-                            <h5 class="card-title"><a href="?command=trips" class="card-title stretched-link">Miles Traveled</a></h5>
+                            <h5 class="card-title"><a href="?command=trips" class="card-title stretched-link">Days of Travel</a></h5>
                             <?php if(!empty($firstTrip)): ?>
                                 <h6 class="card-subtitle mb-2 text-body-secondary"><?php echo $firstTripDate?> - <?php echo date("F j, Y")?></h6>
                             <?php endif; ?>
-                            <p class="card-text display-1"><?php echo $stats[0]["miles_traveled"]?></p>
+                            <p class="card-text display-1"><?php echo $stats[0]["days_traveled"]?></p>
                         </div>
                     </div>
                 </div>
@@ -190,7 +190,6 @@
                             <h1 class="card-title">Year In Review</h1>
                             <h6 class="card-subtitle mb-2 text-body-secondary"><span id="start-month-range">February 2024</span> - <span id="end-month-range">February 2024</span></h6>
                             <p class="card-text">You've been on <span id="year-trips">0</span> trips in the past 12 months!</p>
-                            <!-- <img src="media/placeholder-graph.png" alt="a graph depicting the number of trips taken each month in the past year" class="img-fluid" width="300"> -->
                             <canvas id="travelChart"></canvas>
                         </div>
                     </div>

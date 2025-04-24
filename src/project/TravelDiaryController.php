@@ -73,9 +73,6 @@ class TravelDiaryController {
       case "add_bucketlist":
         $this->addBucketListTrip();
         break;
-      case "userinfo":
-        $this->userInfoAPI();
-        break;
       case "logout":
         $this->logout();
         break;
@@ -148,238 +145,34 @@ class TravelDiaryController {
     $this->showLogin();
   }
 
-  public function userInfoAPI() {
-    $result = $this->db->query("select * from project_users where id = $1", $_SESSION["user_id"]);
-    $userInfo = [
-        "name" => $result[0]["name"],
-        "email" => $result[0]["email"],
-        "date_joined" => $result[0]["date_joined"]
-    ];
-    header("Content-Type: application/json");
-    echo(json_encode($userInfo, JSON_PRETTY_PRINT));
-  }
-
-  public function deleteTrip() {
-    if (!isset($_SESSION["user_id"]) || !isset($this->input["id"])) {
-        header("Location: ?command=trips");
-        exit;
-    }
-    $userId = $_SESSION["user_id"];
-    $tripId = $this->input["id"];
-    $trip_match = $this->db->query("select location from project_trips where id = $1 and user_id = $2;", $tripId, $userId);
-    $location = $trip_match[0]["location"];
-
-    // delete trip
-    $result = $this->db->query("DELETE FROM project_trips WHERE id = $1 AND user_id = $2;", $tripId, $userId);
-
-    // update number of trips in stats
-    $this->db->query("update project_stats set num_trips = num_trips - 1 where user_id = $1;", $userId);
-
-    // update number of cities visited in stats
-    $city_match = $this->db->query("select 1 from project_trips where user_id = $1 and location = $2;", $userId, $location);
-    if (empty($city_match)) {
-      $this->db->query("update project_stats set num_cities = num_cities - 1 where user_id = $1;", $userId);
-    }      
-    // update number of countries visited in stats
-    $new_country = trim(end(explode(',', $_POST["location"])));
-    $country_match = $this->db->query("select 1 from project_trips where user_id = $1 and trim(split_part(location, ',', 3)) ilike $2;", $userId, $new_country);    
-    if (empty($country_match)) {
-      $this->db->query("update project_stats set num_countries = num_countries - 1 where user_id = $1;", $userId);
-    }
-    // update number of vistied bucket list destinations in stats
-    $bucketlist_match = $this->db->query("select 1 from project_bucketlist where user_id = $1 and location = $2;", $userId, $location);
-    if (!empty($bucketlist_match)) {
-      $this->db->query("update project_stats set num_visited = num_visited - 1 where user_id = $1;", $userId);
-      $this->db->query("update project_bucketlist set visited = false where user_id = $1 and location = $2;", $userId, $location);
-    }
-
-
-    header("Location: ?command=trips");
-    exit;
-  }
-
-  public function deleteEntry() {
-    if (!isset($_SESSION["user_id"]) || !isset($this->input["id"])) {
-        header("Location: ?command=entries");
-        exit;
-    }
-    $entryId = $this->input["id"];
-    $userId = $_SESSION["user_id"];
-    $result = $this->db->query("DELETE FROM project_entries WHERE id = $1 AND user_id = $2;", $entryId, $userId);
-
-    // update stats
-    $this->db->query("update project_stats set num_entries = num_entries - 1 where user_id = $1;", $userId);
-
-    header("Location: ?command=entries");
-    exit;
-  }
-
-  public function showEditEntry() {
-    if (!isset($_SESSION["user_id"]) || !isset($this->input["id"])) {
-        header("Location: ?command=entries");
-        exit;
-    }
-    $entryId = $this->input["id"];
-    $userId = $_SESSION["user_id"];
-    $result = $this->db->query("select * from project_entries where id = $1 and user_id = $2;", $entryId, $userId);
-
-    if (empty($result)) {
-        header("Location: ?command=entries");
-        exit;
-    }
-    $userTrips = $this->db->query("select * from project_trips where user_id = $1", $userId);
-    $trip = $this->db->query("select * from project_trips where id = $1", $result[0]["trip_id"]);
-    include("/opt/src/project/templates/edit_entry.php");
-  }
-
-  public function showEditTrip() {
-    if (!isset($_SESSION["user_id"]) || !isset($this->input["id"])) {
-        header("Location: ?command=trips");
-        exit;
-    }
-    $tripId = $this->input["id"];
-    $userId = $_SESSION["user_id"];
-    $result = $this->db->query("select * from project_trips where id = $1 and user_id = $2;", $tripId, $userId);
-
-    if (empty($result)) {
-        header("Location: ?command=trips");
-        exit;
-    }
-    $users = $this->db->query("select name from project_users where id != $1", $userId);
-    include("/opt/src/project/templates/edit_trip.php");
-  }
-
-  public function saveEntryEdits() {
-      if (!isset($_SESSION["user_id"]) || !isset($_POST["entry_id"])) {
-          header("Location: ?command=entries");
-          exit;
-      }
-  
-      $entryId = $_POST["entry_id"];
-      $userId = $_SESSION["user_id"];
-  
-      $result = $this->db->query("SELECT * FROM project_entries WHERE id = $1 AND user_id = $2;", $entryId, $userId);
-  
-      if (empty($result)) {
-          header("Location: ?command=entries");
-          exit;
-      }
-  
-      if (isset($_POST["title"]) && isset($_POST["date"]) && isset($_POST["trip"]) && isset($_POST["entry"]) 
-        && !empty($_POST["title"]) && !empty($_POST["date"]) && !empty($_POST["trip"]) && !empty($_POST["entry"])) {
-
-          $title = $_POST["title"];
-          $date = $_POST["date"];
-          $trip = $_POST["trip"];
-          $entry = $_POST["entry"];
-          $imageUrl = $_POST["image_url"] ?? null;
-
-          $result = $this->db->query("UPDATE project_entries 
-                            SET title = $1, date = $2, trip_id = $3, entry = $4, image_url = $5 
-                            WHERE id = $6 AND user_id = $7;", 
-                            $title, $date, $trip, $entry, $imageUrl, $entryId, $userId);
-          header("Location: ?command=entries");
-          exit;
-      } else {
-          $message = "<p class='alert alert-danger'>Please fill out all required fields</p>";
-          $this->showEditEntry();
-      }
-  }
-
-  public function saveTripEdits() {
-      $userId = $_SESSION["user_id"];
-      if (isset($_POST["trip-name"]) && isset($_POST["start-date"]) && isset($_POST["location"]) && isset($_POST["latitude"]) && isset($_POST["longitude"]) 
-          && !empty($_POST["trip-name"]) && !empty($_POST["start-date"]) && !empty($_POST["location"]) && !empty($_POST["latitude"]) && !empty($_POST["longitude"])) {
-          
-          // update number of cities and countries visited if applicable
-          $city_match = $this->db->query("select 1 from project_trips where user_id = $1 and location = $2;", $userId, $_POST["location"]);
-          if (empty($city_match)) {
-            $this->db->query("update project_stats set num_cities = num_cities + 1 where user_id = $1;", $userId);
-          }      
-          $new_country = trim(explode(',', $_POST["location"])[2]);
-          $country_match = $this->db->query("select 1 from project_trips where user_id = $1 and trim(split_part(location, ',', 3)) ilike $2;", $userId, $new_country);    
-          if (empty($country_match)) {
-            $this->db->query("update project_stats set num_countries = num_countries + 1 where user_id = $1;", $userId);
-          }
-
-          // if location matches bucket list destination, update visited stats and mark bucket list destination as visited
-          $bucketlist_match = $this->db->query("select 1 from project_bucketlist where user_id = $1 and location = $2;", $userId, $_POST["location"]);
-          if (!empty($bucketlist_match)) {
-            $this->db->query("update project_stats set num_visited = num_visited + 1 where user_id = $1;", $userId);
-            $this->db->query("update project_bucketlist set visited = true where user_id = $1 and location = $2;", $userId, $_POST["location"]);
-          }
-
-          // update trip - collaborators and description are optional
-            if (isset($_POST["trip-id"]) && !empty($_POST["trip-id"])) {
-              $trip_id = $_POST["trip-id"];
-              $result = $this->db->query(
-                "UPDATE project_trips 
-                SET name = $2, start_date = $3, end_date = $4, location = $5, latitude = $6, longitude = $7, collaborators = $8, notes = $9
-                WHERE id = $1 AND user_id = $10;", 
-                $trip_id, 
-                $_POST["trip-name"], 
-                $_POST["start-date"], 
-                empty($_POST["end-date"]) ? null : $_POST["end-date"], 
-                $_POST["location"], 
-                $_POST["latitude"], 
-                $_POST["longitude"], 
-                empty($_POST["collaborators"]) ? null : "{" . $_POST["collaborators"] . "}",
-                empty($_POST["trip-description"]) ? null : $_POST["trip-description"],
-                $_SESSION["user_id"]);
-          }
-
-          header("Location: ?command=trips");
-          exit;
-
-      } else {
-          $message = "<p class='alert alert-danger'>Please fill out all required fields</p>";
-          $this->showAddTrip();
-      }
-  }
-
-
   public function addTrip() {
     $userId = $_SESSION["user_id"];
     if (isset($_POST["trip-name"]) && isset($_POST["start-date"]) && isset($_POST["location"]) && isset($_POST["latitude"]) && isset($_POST["longitude"]) 
     && !empty($_POST["trip-name"]) && !empty($_POST["start-date"]) && !empty($_POST["location"]) && !empty($_POST["latitude"]) && !empty($_POST["longitude"])) {
-      
-      // update number of cities visited in stats
-      $city_match = $this->db->query("select 1 from project_trips where user_id = $1 and location = $2;", $userId, $_POST["location"]);
-      if (empty($city_match)) {
-        $this->db->query("update project_stats set num_cities = num_cities + 1 where user_id = $1;", $userId);
-      }      
-      // update number of countries visited in stats
-      $new_country = trim(end(explode(',', $_POST["location"])));
-      $country_match = $this->db->query("select 1 from project_trips where user_id = $1 and trim(split_part(location, ',', 3)) ilike $2;", $userId, $new_country);    
-      if (empty($country_match)) {
-        $this->db->query("update project_stats set num_countries = num_countries + 1 where user_id = $1;", $userId);
-      }
-
-      // update number of trips in stats 
-      $stat = $this->db->query("update project_stats set num_trips = num_trips + 1 where user_id = $1;", $userId);
-
-      // if location matches bucket list destination, update visited stats and mark bucket list destination as visited
-      $bucketlist_match = $this->db->query("select 1 from project_bucketlist where user_id = $1 and location = $2;", $userId, $_POST["location"]);
-      if (!empty($bucketlist_match)) {
-        $this->db->query("update project_stats set num_visited = num_visited + 1 where user_id = $1;", $userId);
-        $this->db->query("update project_bucketlist set visited = true where user_id = $1 and location = $2;", $userId, $_POST["location"]);
-      }
+      $location = $_POST["location"];
+      $start_date = $_POST["start-date"];
+      $end_date = empty($_POST["end-date"]) ? null : $_POST["end-date"];
+      $duration = $this->getDuration($start_date, $end_date);
       
       // insert new trip - collaborators and description are optional
       $result = $this->db->query(
         "insert into project_trips 
-        (user_id, name, start_date, end_date, location, latitude, longitude, collaborators, notes) 
-        values ($1, $2, $3, $4, $5, $6, $7, $8, $9) returning id;",
+        (user_id, name, start_date, end_date, duration, location, latitude, longitude, collaborators, notes) 
+        values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) returning id;",
         $userId,
         $_POST["trip-name"],
-        $_POST["start-date"],
-        empty($_POST["end-date"]) ? null : $_POST["end-date"],
-        $_POST["location"],
+        $start_date,
+        $end_date,
+        $duration,
+        $location,
         $_POST["latitude"],
         $_POST["longitude"],
         empty($_POST["collaborators"]) ? null : "{" . $_POST["collaborators"] . "}",
         empty($_POST["trip-description"]) ? null : $_POST["trip-description"]
-      );      
+      );
+
+      //update stats
+      $this->updateStats($location, $duration);
 
       header("Location: ?command=trips");
       exit;
@@ -391,6 +184,60 @@ class TravelDiaryController {
       $message = "<p class='alert alert-danger'>Please fill out all required fields</p>";
       $this->showAddTrip();
     }
+  }
+
+  public function deleteTrip() {
+    if (!isset($_SESSION["user_id"]) || !isset($this->input["id"])) {
+        header("Location: ?command=trips");
+        exit;
+    }
+    $userId = $_SESSION["user_id"];
+    $tripId = $this->input["id"];
+    $trip = $this->db->query("select * from project_trips where id = $1 and user_id = $2;", $tripId, $userId);
+
+    // delete trip
+    $this->db->query("DELETE FROM project_trips WHERE id = $1 AND user_id = $2;", $tripId, $userId);
+
+    // update associated stats
+    $this->updateStats($trip);
+
+    header("Location: ?command=trips");
+    exit;
+  }
+
+  public function saveTripEdits() {
+    $userId = $_SESSION["user_id"];
+    if (isset($_POST["trip-id"]) && isset($_POST["trip-name"]) && isset($_POST["start-date"]) && isset($_POST["location"]) && isset($_POST["latitude"]) && isset($_POST["longitude"]) 
+        && !empty($_POST["trip-id"]) && !empty($_POST["trip-name"]) && !empty($_POST["start-date"]) && !empty($_POST["location"]) && !empty($_POST["latitude"]) && !empty($_POST["longitude"])) {
+        $tripId = $_POST["trip-id"];
+        $location = $_POST["location"];
+        $start_date = $_POST["start-date"];
+        $end_date = empty($_POST["end-date"]) ? null : $_POST["end-date"];
+        $duration = $this->getDuration($start_date, $end_date);
+
+        // update trip - collaborators and description are optional
+        $result = $this->db->query(
+                  "UPDATE project_trips 
+                  SET name = $2, start_date = $3, end_date = $4, duration = $5, location = $6, latitude = $7, longitude = $8, collaborators = $9, notes = $10
+                  WHERE id = $1 AND user_id = $11;", 
+                  $tripId, 
+                  $_POST["trip-name"], 
+                  $start_date,
+                  $end_date, 
+                  $duration,
+                  $location, 
+                  $_POST["latitude"], 
+                  $_POST["longitude"], 
+                  empty($_POST["collaborators"]) ? null : "{" . $_POST["collaborators"] . "}",
+                  empty($_POST["trip-description"]) ? null : $_POST["trip-description"],
+                  $_SESSION["user_id"]
+        );
+        // update stats
+        $this->updateStats();
+    }
+
+    header("Location: ?command=trips");
+    exit;
   }
 
   public function addEntry() {
@@ -410,6 +257,59 @@ class TravelDiaryController {
     } else {
       $message = "<p class='alert alert-danger'>Please fill out all required fields</p>";
       $this->showAddEntry();
+    }
+  }
+  
+  public function deleteEntry() {
+    if (!isset($_SESSION["user_id"]) || !isset($this->input["id"])) {
+        header("Location: ?command=entries");
+        exit;
+    }
+    $entryId = $this->input["id"];
+    $userId = $_SESSION["user_id"];
+    $result = $this->db->query("DELETE FROM project_entries WHERE id = $1 AND user_id = $2;", $entryId, $userId);
+
+    // update stats
+    $this->db->query("update project_stats set num_entries = num_entries - 1 where user_id = $1;", $userId);
+
+    header("Location: ?command=entries");
+    exit;
+  }
+
+  public function saveEntryEdits() {
+    if (!isset($_SESSION["user_id"]) || !isset($_POST["entry_id"])) {
+        header("Location: ?command=entries");
+        exit;
+    }
+
+    $entryId = $_POST["entry_id"];
+    $userId = $_SESSION["user_id"];
+
+    $result = $this->db->query("SELECT * FROM project_entries WHERE id = $1 AND user_id = $2;", $entryId, $userId);
+
+    if (empty($result)) {
+        header("Location: ?command=entries");
+        exit;
+    }
+
+    if (isset($_POST["title"]) && isset($_POST["date"]) && isset($_POST["trip"]) && isset($_POST["entry"]) 
+      && !empty($_POST["title"]) && !empty($_POST["date"]) && !empty($_POST["trip"]) && !empty($_POST["entry"])) {
+
+        $title = $_POST["title"];
+        $date = $_POST["date"];
+        $trip = $_POST["trip"];
+        $entry = $_POST["entry"];
+        $imageUrl = $_POST["image_url"] ?? null;
+
+        $result = $this->db->query("UPDATE project_entries 
+                          SET title = $1, date = $2, trip_id = $3, entry = $4, image_url = $5 
+                          WHERE id = $6 AND user_id = $7;", 
+                          $title, $date, $trip, $entry, $imageUrl, $entryId, $userId);
+        header("Location: ?command=entries");
+        exit;
+    } else {
+        $message = "<p class='alert alert-danger'>Please fill out all required fields</p>";
+        $this->showEditEntry();
     }
   }
 
@@ -449,6 +349,27 @@ class TravelDiaryController {
     // update number of bucket list destinations in user stats
     $this->db->query("update project_stats set num_bucketlist = num_bucketlist + 1 where user_id = $1;", $userId);
     echo json_encode(['status' => 'success', 'message' => 'Location added successfully!']);
+  }
+
+  public function updateStats() {
+    $userId = $_SESSION["user_id"];
+    $numTrips = $this->db->query("SELECT COUNT(*) FROM project_trips WHERE user_id = $1;", $userId)[0]["count"];
+    $daysTraveled = $this->db->query("SELECT COALESCE(SUM(duration), 0) AS total_days FROM project_trips WHERE user_id = $1;", $userId)[0]["total_days"];
+    $numCities = $this->db->query("SELECT COUNT(DISTINCT location) FROM project_trips WHERE user_id = $1;", $userId)[0]["count"];
+    $numCountries = $this->db->query("SELECT COUNT(DISTINCT TRIM(SPLIT_PART(location, ',', array_length(string_to_array(location, ','), 1)))) FROM project_trips WHERE user_id = $1;", $userId)[0]["count"];
+    
+    $this->db->query("UPDATE project_stats SET num_trips = $2 , num_cities = $3, num_countries = $4, days_traveled = $5 WHERE user_id = $1;", $userId, $numTrips, $numTrips, $numCountries, $daysTraveled);
+  }
+
+  public function getDuration($start_date, $end_date) {
+    if (empty($end_date)) {
+      $duration = 1;
+    } else {
+      $startDate = new DateTime($start_date);
+      $endDate = new DateTime($end_date);
+      $duration = $startDate->diff($endDate)->days + 1;
+    }
+    return $duration;
   }
   
   public function showLogin($message = "") {
@@ -492,6 +413,42 @@ class TravelDiaryController {
   public function showAddEntry($message = "") {
     $userTrips = $this->db->query("select * from project_trips where user_id = $1", $_SESSION["user_id"]);
     include("/opt/src/project/templates/add_entry.php");
+  }
+
+  
+  public function showEditEntry() {
+    if (!isset($_SESSION["user_id"]) || !isset($this->input["id"])) {
+        header("Location: ?command=entries");
+        exit;
+    }
+    $entryId = $this->input["id"];
+    $userId = $_SESSION["user_id"];
+    $result = $this->db->query("select * from project_entries where id = $1 and user_id = $2;", $entryId, $userId);
+
+    if (empty($result)) {
+        header("Location: ?command=entries");
+        exit;
+    }
+    $userTrips = $this->db->query("select * from project_trips where user_id = $1", $userId);
+    $trip = $this->db->query("select * from project_trips where id = $1", $result[0]["trip_id"]);
+    include("/opt/src/project/templates/edit_entry.php");
+  }
+
+  public function showEditTrip() {
+    if (!isset($_SESSION["user_id"]) || !isset($this->input["id"])) {
+        header("Location: ?command=trips");
+        exit;
+    }
+    $tripId = $this->input["id"];
+    $userId = $_SESSION["user_id"];
+    $result = $this->db->query("select * from project_trips where id = $1 and user_id = $2;", $tripId, $userId);
+
+    if (empty($result)) {
+        header("Location: ?command=trips");
+        exit;
+    }
+    $users = $this->db->query("select name from project_users where id != $1", $userId);
+    include("/opt/src/project/templates/edit_trip.php");
   }
 
   public function showStats($message = "") {
