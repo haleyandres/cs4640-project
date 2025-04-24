@@ -40,6 +40,14 @@
                 const sortOrder = $(this).val();
                 sortTrips(sortOrder === "asc");
             });
+
+            // confirmation for delete
+            $("a[href*='command=delete_trip']").on("click", function (e) {
+                const confirmed = confirm("Are you sure you want to delete this trip?");
+                if (!confirmed) {
+                    e.preventDefault();
+                }
+            });
         });
         </script>
 
