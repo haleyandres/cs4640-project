@@ -47,7 +47,8 @@
             longitude double precision not null,
             start_date date default current_date,
             end_date date,
-            collaborators text[],
+            duration int,
+            collaborators int[],
             notes text
             );");
 

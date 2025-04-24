@@ -73,6 +73,9 @@ class TravelDiaryController {
       case "add_bucketlist":
         $this->addBucketListTrip();
         break;
+      case "fetch_users":
+        $this->fetchUsers();
+        break;
       case "logout":
         $this->logout();
         break;
@@ -153,6 +156,12 @@ class TravelDiaryController {
       $start_date = $_POST["start-date"];
       $end_date = empty($_POST["end-date"]) ? null : $_POST["end-date"];
       $duration = $this->getDuration($start_date, $end_date);
+
+      $collaborators = null;
+      if (!empty($_POST["collaborators"])) {
+          $ids = array_map('intval', $_POST["collaborators"]);
+          $collaborators = '{' . implode(',', $ids) . '}';
+      }
       
       // insert new trip - collaborators and description are optional
       $result = $this->db->query(
@@ -167,7 +176,7 @@ class TravelDiaryController {
         $location,
         $_POST["latitude"],
         $_POST["longitude"],
-        empty($_POST["collaborators"]) ? null : "{" . $_POST["collaborators"] . "}",
+        $collaborators,
         empty($_POST["trip-description"]) ? null : $_POST["trip-description"]
       );
 
@@ -176,10 +185,6 @@ class TravelDiaryController {
 
       header("Location: ?command=trips");
       exit;
-
-      $this->showTrips();
-
-      return;
     } else {
       $message = "<p class='alert alert-danger'>Please fill out all required fields</p>";
       $this->showAddTrip();
@@ -215,6 +220,12 @@ class TravelDiaryController {
         $end_date = empty($_POST["end-date"]) ? null : $_POST["end-date"];
         $duration = $this->getDuration($start_date, $end_date);
 
+        $collaborators = null;
+        if (!empty($_POST["collaborators"])) {
+            $ids = array_map('intval', $_POST["collaborators"]);
+            $collaborators = '{' . implode(',', $ids) . '}';
+        }
+
         // update trip - collaborators and description are optional
         $result = $this->db->query(
                   "UPDATE project_trips 
@@ -228,7 +239,7 @@ class TravelDiaryController {
                   $location, 
                   $_POST["latitude"], 
                   $_POST["longitude"], 
-                  empty($_POST["collaborators"]) ? null : "{" . $_POST["collaborators"] . "}",
+                  $collaborators,
                   empty($_POST["trip-description"]) ? null : $_POST["trip-description"],
                   $_SESSION["user_id"]
         );
@@ -464,5 +475,11 @@ class TravelDiaryController {
     $bucketlistComplete = json_encode($this->db->query("select * FROM project_bucketlist where user_id = $1 and visited = true;", $userId));
 
     include("/opt/src/project/templates/stats.php");
+  }
+
+  public function fetchUsers() {
+    $userId = $_SESSION["user_id"];
+    $users = $this->db->query("SELECT * from project_users WHERE id != $1;", $userId);
+    echo(json_encode($users));
   }
 }

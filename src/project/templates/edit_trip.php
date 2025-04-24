@@ -8,14 +8,21 @@
 
         <meta name="author" content="Haley Andres & Alwyn Dippenaar">
         <meta name="description" content="Document your adventures around the globe.">
+
+        <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">       
         <link rel="stylesheet" href="styles/main.css">
+
+        <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+        <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     
         <script>
             document.addEventListener('DOMContentLoaded', () => {
                 const input = document.getElementById('location-input');
                 const suggestions = document.getElementById('suggestions');
                 let selectedPlace = null;
+                let collabIds = <?= json_encode($result[0]['collaborators']) ?>;
 
                 // fill hidden fields
                 const locationHidden = document.getElementById('location');
@@ -70,6 +77,27 @@
                         timer = setTimeout(() => func.apply(this, args), delay);
                     };
                 }
+
+                $('#collaborators').select2({
+                    width: '100%',
+                    ajax: {
+                        url: '?command=fetch_users',
+                        dataType: 'json',
+                        delay: 250,
+                        cache: true,
+                        processResults: function(data) {
+                            return {
+                                results: data.map(function(user) {
+                                    return {
+                                        id: user.id,
+                                        text: user.name
+                                    };
+                                })
+                            };
+                        }
+                    }
+                });
+                
             });
         </script>
     
@@ -127,13 +155,11 @@
                             <input type="hidden" id="longitude" name="longitude">
                         </div>
                         <div class="mb-3">
-                            <label for="collaborators" class="form-label">Collaborators (optional)</label>
-                            <select id="collaborators" name="collaborators" class="form-select" aria-label="collaborators">
-                                <option selected><?php if(!empty($result[0]["collaborators"])) echo str_replace(',', ', ', str_replace(["{", "}", "\""], "", $result[0]["collaborators"]))?></option>
-                                <?php foreach($users as $user): ?>
-                                    <option><?php echo $user["name"];?></option>
-                                <?php endforeach; ?>
-                            </select>
+                            <div class="position-relative">
+                                <label for="collaborators">Collaborators
+                                    <select class="js-example-basic-multiple js-states form-control" id="collaborators" name="collaborators[]" multiple="multiple"></select>
+                                </label>
+                            </div>
                         </div>
                         <div class="mb-3">
                             <label for="trip-description" class="form-label">Description (optional)</label>
