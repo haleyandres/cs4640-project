@@ -88,6 +88,17 @@
                         }
                     }
                 });
+
+                // verify end date is not before start date
+                document.getElementById('add-trip-form').addEventListener('submit', function (e) {
+                    const startDate = document.getElementById('start-date').value;
+                    const endDate = document.getElementById('end-date').value;
+
+                    if (endDate && endDate < startDate) {
+                        e.preventDefault();
+                        alert("End date cannot be before the start date.");
+                    }
+                });
             });
         </script>
 
