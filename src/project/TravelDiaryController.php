@@ -399,7 +399,7 @@ class TravelDiaryController {
     $numCities = $this->db->query("SELECT COUNT(DISTINCT location) FROM project_trips WHERE user_id = $1;", $userId)[0]["count"];
     $numCountries = $this->db->query("SELECT COUNT(DISTINCT TRIM(SPLIT_PART(location, ',', array_length(string_to_array(location, ','), 1)))) FROM project_trips WHERE user_id = $1;", $userId)[0]["count"];
     
-    $this->db->query("UPDATE project_stats SET num_trips = $2 , num_cities = $3, num_countries = $4, days_traveled = $5 WHERE user_id = $1;", $userId, $numTrips, $numTrips, $numCountries, $daysTraveled);
+    $this->db->query("UPDATE project_stats SET num_trips = $2 , num_cities = $3, num_countries = $4, days_traveled = $5 WHERE user_id = $1;", $userId, $numTrips, $numCities, $numCountries, $daysTraveled);
   }
 
   public function getDuration($start_date, $end_date) {
@@ -515,6 +515,7 @@ class TravelDiaryController {
   }
 
   public function showStats($message = "") {
+    $this->updateStats();
     $userId = $_SESSION["user_id"];
     $stats = $this->db->query("select * from project_stats where user_id = $1", $userId);
     $firstTrip = $this->db->query("select start_date from project_trips where user_id = $1 order by start_date asc limit 1;", $userId);
