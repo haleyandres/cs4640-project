@@ -194,6 +194,12 @@
                     </div>
                     <button type="submit" id="add-location" class="btn btn-secondary ms-2">Add</button>
                 </div>
+                <div class="col-7 d-flex align-items-center justify-content-end position-relative">
+                    <img src="https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png" class="img-fluid me-2" alt="red marker">
+                    <p class="mb-0 me-4">Bucket list</p>
+                    <img src="https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-blue.png" class="img-fluid me-2" alt="blue marker">
+                    <p class="mb-0 me-3">Trip</p>
+                </div>
             </div>
             <div class="row">
                 <div class="col-12">
