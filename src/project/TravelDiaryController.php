@@ -443,7 +443,13 @@ class TravelDiaryController {
   }
 
   public function showTrips($message = "") {
-    $trips = $this->db->query("select * from project_trips where user_id = $1 order by start_date desc;", $_SESSION["user_id"]);
+    $userId = $_SESSION["user_id"];
+    $userName = $this->db->query("SELECT name FROM project_users WHERE id = $1;", $userId)[0]["name"];
+    $trips = $this->db->query("SELECT project_trips.*, project_users.name AS creator 
+                               FROM project_trips 
+                               JOIN project_users ON project_trips.user_id = project_users.id 
+                               WHERE project_trips.user_id = $1 OR $1 = ANY(project_trips.collaborators);", 
+                               $userId);
     include("/opt/src/project/templates/trips.php");
   }
 

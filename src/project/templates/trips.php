@@ -114,10 +114,14 @@
                                     </h6>
                                 </div>
                                 <div class="card-body">
-                                    <p class="card-text"><?=$trip["location"]?></p>
-                                    <p class="card-text p-0"> Notes: <?=$trip["notes"]?></p>
-                                    <a href="?command=edit_trip&id=<?= $trip['id'] ?>" class="btn btn-sm" style="background-color: gainsboro; color: black;">Edit</a>
-                                    <a href="?command=delete_trip&id=<?= $trip['id'] ?>" class="btn btn-sm" style="background-color: gainsboro; color: black;">Delete</a>
+                                    <p class="card-text"><strong>Created By: </strong><?=$trip["creator"]?></p>
+                                    <p class="card-text"><strong>Location: </strong><?=$trip["location"]?></p>
+                                    <p class="card-text p-0"><strong>Notes: </strong><?=$trip["notes"]?></p>
+                                    <!-- show edit + delete button only if current user is trip creator -->
+                                    <?php if($userName === $trip["creator"]): ?>
+                                        <a href="?command=edit_trip&id=<?= $trip['id'] ?>" class="btn btn-sm" style="background-color: gainsboro; color: black;">Edit</a>
+                                        <a href="?command=delete_trip&id=<?= $trip['id'] ?>" class="btn btn-sm" style="background-color: gainsboro; color: black;">Delete</a>
+                                    <?php endif; ?>
                                 </div>
                             </div>
                         </div>
