@@ -10,6 +10,10 @@ class TravelDiaryController {
     session_start();
     $this->db = new Database();
     $this->input = $input;
+
+    ini_set('display_errors', '1');
+    ini_set('display_startup_errors', '1');
+    error_reporting(E_ALL);
   }
 
   public function run() {
@@ -163,6 +167,11 @@ class TravelDiaryController {
           $collaborators = '{' . implode(',', $ids) . '}';
       }
       
+      // update bucket list visited status if location is not visited + in bucket list
+      if (!$this->inTrips($location) && $this->onBucketList($location)) {
+        $this->db->query("update project_bucketlist set visited = true where user_id = $1 and location = $2;", $userId, $location);
+      }
+      
       // insert new trip - collaborators and description are optional
       $result = $this->db->query(
         "insert into project_trips 
@@ -181,7 +190,7 @@ class TravelDiaryController {
       );
 
       //update stats
-      $this->updateStats($location, $duration);
+      $this->updateStats();
 
       header("Location: ?command=trips");
       exit;
@@ -199,12 +208,18 @@ class TravelDiaryController {
     $userId = $_SESSION["user_id"];
     $tripId = $this->input["id"];
     $trip = $this->db->query("select * from project_trips where id = $1 and user_id = $2;", $tripId, $userId);
+    $location = $trip[0]["location"];
 
     // delete trip
     $this->db->query("DELETE FROM project_trips WHERE id = $1 AND user_id = $2;", $tripId, $userId);
 
-    // update associated stats
-    $this->updateStats($trip);
+    // update stats
+    $this->updateStats();
+
+    // update bucket list visited status if location is in bucket list + was unique 
+    if (!$this->inTrips($location) && $this->onBucketList($location)) {
+      $this->db->query("update project_bucketlist set visited = false where user_id = $1 and location = $2;", $userId, $location);
+    }
 
     header("Location: ?command=trips");
     exit;
@@ -226,6 +241,8 @@ class TravelDiaryController {
             $collaborators = '{' . implode(',', $ids) . '}';
         }
 
+        $old_location = $this->db->query("SELECT location from project_trips WHERE user_id = $1 and id = $2;", $userId, $tripId)[0]["location"];
+
         // update trip - collaborators and description are optional
         $result = $this->db->query(
                   "UPDATE project_trips 
@@ -245,6 +262,16 @@ class TravelDiaryController {
         );
         // update stats
         $this->updateStats();
+
+        // if old location was unique in trips + on bucket list, update visited status
+        if (!$this->inTrips($old_location) && $this->onBucketList($old_location)) {
+            $this->db->query("update project_bucketlist set visited = false where user_id = $1 and location = $2;", $userId, $old_location);
+        }
+
+        // if new location is unique in trips + on bucket list, update visited status
+        if (!$this->inTrips($location) && $this->onBucketList($location)) {
+          $this->db->query("update project_bucketlist set visited = true where user_id = $1 and location = $2;", $userId, $location);
+        }
     }
 
     header("Location: ?command=trips");
@@ -381,6 +408,22 @@ class TravelDiaryController {
       $duration = $startDate->diff($endDate)->days + 1;
     }
     return $duration;
+  }
+
+  // checks if a location is in user's trips
+  public function inTrips($location) {
+    $userId = $_SESSION["user_id"];
+    $results = $this->db->query("SELECT * FROM project_trips WHERE user_id = $1 AND location = $2;", $userId, $location);
+    if (empty($results)) return false;
+    return true;
+  }
+
+  // checks if a location is on user's bucketlist
+  public function onBucketList($location) {
+    $userId = $_SESSION["user_id"];
+    $results = $this->db->query("SELECT * FROM project_bucketlist WHERE user_id = $1 AND location = $2;", $userId, $location);
+    if (empty($results)) return false;
+    return true;
   }
   
   public function showLogin($message = "") {

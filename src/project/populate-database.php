@@ -67,7 +67,6 @@
             num_trips int default 0,
             num_entries int default 0,
             num_bucketlist int default 0,
-            num_visited int default 0,
             num_cities int default 0,
             num_countries int default 0,
             days_traveled int default 0
