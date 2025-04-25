@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        <title>Travel Diary - Add Trip</title>
+        <title>Travel Diary - Edit Trip</title>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1"> 
@@ -22,7 +22,7 @@
                 const input = document.getElementById('location-input');
                 const suggestions = document.getElementById('suggestions');
                 let selectedPlace = null;
-                let collabIds = <?= json_encode($result[0]['collaborators']) ?>;
+                let collabIds = <?= json_encode($result[0]['collaborators']) ?>.replace(/[{}]/g, "").split(',');
 
                 // fill hidden fields
                 const locationHidden = document.getElementById('location');
@@ -85,6 +85,11 @@
                         dataType: 'json',
                         delay: 250,
                         cache: true,
+                        data: function (params) {
+                            return {
+                                q: params.term
+                            };
+                        },
                         processResults: function(data) {
                             return {
                                 results: data.map(function(user) {
@@ -96,6 +101,24 @@
                             };
                         }
                     }
+                });
+
+                let select = $('#collaborators');
+                collabIds.forEach(id => {
+                    $.ajax({
+                        type: 'GET',
+                        url: `?command=get_user_by_id&id=${id}`,
+                        dataType: 'json'
+                    }).then(function (user) {
+                        const option = new Option(user.name, user.id, true, true);
+                        select.append(option).trigger('change');
+                        select.trigger({
+                            type: 'select2:select',
+                            params: {
+                                data: user
+                            }
+                        });
+                    });
                 });
                 
             });
@@ -129,10 +152,10 @@
             <div class="row title my-4">
                 <h1>Edit Trip</h1>
             </div>
-            <!-- add trip form -->
+            <!-- edit trip form -->
             <div class="row justify-content-center">
                 <div class="col-6">
-                    <form id="add-trip-form" action="?command=save_trip_edits" method="POST">
+                    <form id="edit-trip-form" action="?command=save_trip_edits" method="POST">
                         <input type="hidden" name="trip-id" value="<?= $tripId ?>">
                         <div class="mb-3">
                             <label for="trip-name" class="form-label">Trip Name</label>

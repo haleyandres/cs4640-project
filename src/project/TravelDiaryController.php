@@ -80,6 +80,9 @@ class TravelDiaryController {
       case "fetch_users":
         $this->fetchUsers();
         break;
+      case "get_user_by_id":
+        $this->getUserById();
+        break;
       case "logout":
         $this->logout();
         break;
@@ -527,8 +530,15 @@ class TravelDiaryController {
   }
 
   public function fetchUsers() {
+    $term = $_GET['q'] ?? '';
     $userId = $_SESSION["user_id"];
-    $users = $this->db->query("SELECT * from project_users WHERE id != $1;", $userId);
-    echo(json_encode($users));
+    $matches = $this->db->query("SELECT * FROM project_users WHERE id != $1 AND name LIKE '%' || $2 || '%' ORDER BY name ASC;", $userId, $term);
+    echo(json_encode($matches));
+  }
+
+  public function getUserById() {
+    $id = intval($this->input['id']);
+    $user = $this->db->query("SELECT name FROM project_users WHERE id = $1;", $id)[0]["name"];
+    echo json_encode(["id" => $id, "name" => $user]);
   }
 }

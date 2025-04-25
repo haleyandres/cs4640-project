@@ -76,6 +76,11 @@
                         dataType: 'json',
                         delay: 250,
                         cache: true,
+                        data: function (params) {
+                            return {
+                                q: params.term
+                            };
+                        },
                         processResults: function(data) {
                             return {
                                 results: data.map(function(user) {
