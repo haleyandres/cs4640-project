@@ -22,7 +22,6 @@
                 const input = document.getElementById('location-input');
                 const suggestions = document.getElementById('suggestions');
                 let selectedPlace = null;
-                let collabIds = <?= json_encode($result[0]['collaborators']) ?>.replace(/[{}]/g, "").split(',');
 
                 // fill hidden fields
                 const locationHidden = document.getElementById('location');
@@ -103,23 +102,28 @@
                     }
                 });
 
-                let select = $('#collaborators');
-                collabIds.forEach(id => {
-                    $.ajax({
-                        type: 'GET',
-                        url: `?command=get_user_by_id&id=${id}`,
-                        dataType: 'json'
-                    }).then(function (user) {
-                        const option = new Option(user.name, user.id, true, true);
-                        select.append(option).trigger('change');
-                        select.trigger({
-                            type: 'select2:select',
-                            params: {
-                                data: user
-                            }
+                let rawCollabs = <?= json_encode($result[0]['collaborators']) ?>;
+                let collabIds = rawCollabs ? rawCollabs.replace(/[{}]/g, "").split(',') : [];
+
+                if (collabIds.length > 0 && collabIds[0] !== "") {
+                    let select = $('#collaborators');
+                    collabIds.forEach(id => {
+                        $.ajax({
+                            type: 'GET',
+                            url: `?command=get_user_by_id&id=${id}`,
+                            dataType: 'json'
+                        }).then(function (user) {
+                            const option = new Option(user.name, user.id, true, true);
+                            select.append(option).trigger('change');
+                            select.trigger({
+                                type: 'select2:select',
+                                params: {
+                                    data: user
+                                }
+                            });
                         });
                     });
-                });
+                }
                 
             });
         </script>
